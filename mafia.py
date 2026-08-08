@@ -6,6 +6,7 @@ import asyncio
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
+
 app = FastAPI()
 
 rooms = {}
@@ -28,7 +29,7 @@ HTML = r"""
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>Мафия</title>
+<title>Mafia Night</title>
 
 <style>
 
@@ -37,7 +38,9 @@ HTML = r"""
 }
 
 body {
+
     margin: 0;
+
     min-height: 100vh;
 
     font-family:
@@ -45,346 +48,846 @@ body {
         Helvetica,
         sans-serif;
 
+    color: #ffffff;
+
     background:
+
         radial-gradient(
-            circle at top,
-            #29203d,
-            #100d18 60%,
-            #08070c
+            circle at 50% -10%,
+            #38234e 0%,
+            #171321 38%,
+            #09080d 80%
         );
 
-    color: white;
-
-    padding: 25px;
+    overflow-x: hidden;
 }
+
+
+/* ============================================================
+   BACKGROUND
+   ============================================================ */
+
+body::before {
+
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(124,58,237,.08),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 80% 70%,
+            rgba(220,38,38,.07),
+            transparent 30%
+        );
+
+}
+
+
+/* ============================================================
+   CONTAINER
+   ============================================================ */
 
 .container {
-    max-width: 1100px;
-    margin: auto;
+
+    width: min(
+        1200px,
+        calc(100% - 30px)
+    );
+
+    margin: 0 auto;
+
+    padding: 30px 0 60px;
+
 }
 
-h1 {
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.logo {
+
     text-align: center;
+
     margin-bottom: 25px;
+
 }
+
+.logo h1 {
+
+    margin: 0;
+
+    font-size: clamp(
+        38px,
+        7vw,
+        72px
+    );
+
+    letter-spacing: 10px;
+
+    font-weight: 900;
+
+    text-shadow:
+        0 0 30px
+        rgba(255,255,255,.15);
+
+}
+
+.logo p {
+
+    margin: 10px 0 0;
+
+    color: #958ca4;
+
+    letter-spacing: 3px;
+
+    font-size: 12px;
+
+}
+
+
+/* ============================================================
+   CARD
+   ============================================================ */
 
 .card {
-    background: rgba(25, 21, 35, 0.95);
 
-    border: 1px solid rgba(255,255,255,0.08);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(30,26,41,.96),
+            rgba(14,12,20,.96)
+        );
 
-    border-radius: 18px;
+    border:
 
-    padding: 20px;
+        1px solid
+        rgba(255,255,255,.07);
+
+    border-radius: 22px;
+
+    padding: 24px;
 
     box-shadow:
-        0 15px 50px rgba(0,0,0,0.35);
+
+        0 25px 70px
+        rgba(0,0,0,.4),
+
+        inset 0 1px 0
+        rgba(255,255,255,.03);
+
 }
 
-.hidden {
-    display: none !important;
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+
+.login {
+
+    max-width: 600px;
+
+    margin: 30px auto;
+
 }
 
-.row {
-    display: flex;
+.login h2 {
+
+    text-align: center;
+
+    margin-top: 0;
+
+}
+
+.inputs {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 180px;
+
     gap: 10px;
-    flex-wrap: wrap;
+
 }
+
 
 input {
-    flex: 1;
 
-    min-width: 200px;
+    width: 100%;
 
-    padding: 14px 16px;
+    padding: 16px;
 
-    border-radius: 12px;
+    border-radius: 14px;
 
-    border: 1px solid #3a3348;
+    border:
 
-    background: #15121d;
+        1px solid
+        #393244;
+
+    background:
+        #121019;
 
     color: white;
 
     outline: none;
 
     font-size: 15px;
+
 }
+
 
 input:focus {
-    border-color: #8b5cf6;
+
+    border-color:
+        #8b5cf6;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(139,92,246,.12);
+
 }
+
 
 button {
-    border: none;
 
-    border-radius: 12px;
+    border: 0;
 
-    padding: 13px 18px;
+    border-radius: 14px;
 
-    background: #7c3aed;
+    padding: 14px 20px;
 
     color: white;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition:
-        transform 0.15s,
-        opacity 0.15s;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    opacity: 0.9;
-}
-
-button:active {
-    transform: translateY(0);
-}
-
-.secondary {
-    background: #302a3c;
-}
-
-.danger {
-    background: #dc2626;
-}
-
-.success {
-    background: #059669;
-}
-
-.actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 15px;
-}
-
-.error {
-    color: #ff6b6b;
-    margin-top: 12px;
-    min-height: 20px;
-}
-
-#gameScreen {
-    margin-top: 25px;
-}
-
-.topbar {
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        1fr
-        100px;
-
-    gap: 15px;
-
-    align-items: center;
-}
-
-.small {
-    color: #9f96ad;
-    font-size: 12px;
-}
-
-.room-code {
-    font-size: 30px;
-    font-weight: bold;
-    letter-spacing: 5px;
-}
-
-.phase {
-    font-weight: bold;
-    font-size: 17px;
-}
-
-.role {
-    margin-top: 5px;
-    color: #bda9ff;
-}
-
-.timer {
-    text-align: center;
-
-    font-size: 32px;
-
-    font-weight: bold;
-
-    background: #17131f;
-
-    padding: 12px;
-
-    border-radius: 14px;
-}
-
-.announcement {
-    margin-top: 20px;
-
-    padding: 16px;
-
-    border-radius: 14px;
-
-    background: rgba(124,58,237,0.15);
-
-    border: 1px solid rgba(124,58,237,0.3);
-
-    text-align: center;
-
-    font-size: 17px;
-}
-
-.grid {
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        1fr;
-
-    gap: 20px;
-
-    margin-top: 20px;
-}
-
-.players {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.player {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    padding: 12px;
-
-    border-radius: 12px;
-
-    background: #17131f;
-}
-
-.player.dead {
-    opacity: 0.4;
-    text-decoration: line-through;
-}
-
-.player-name {
-    font-weight: bold;
-}
-
-.badge {
-    padding: 5px 9px;
-
-    border-radius: 8px;
-
-    font-size: 12px;
-}
-
-.alive {
-    background: #064e3b;
-    color: #6ee7b7;
-}
-
-.dead-badge {
-    background: #4c0519;
-    color: #fda4af;
-}
-
-.log {
-    max-height: 350px;
-
-    overflow-y: auto;
-}
-
-.log-item {
-    padding: 9px 0;
-
-    border-bottom:
-        1px solid
-        rgba(255,255,255,0.05);
-
-    color: #c7bfce;
-}
-
-.action-button {
-    width: 100%;
-
-    margin-top: 7px;
-}
-
-.targets {
-    margin-top: 15px;
-}
-
-.result {
-    margin-top: 20px;
-
-    padding: 20px;
-
-    border-radius: 16px;
 
     background:
         linear-gradient(
             135deg,
-            rgba(124,58,237,0.2),
-            rgba(0,0,0,0.2)
+            #8b5cf6,
+            #6d28d9
+        );
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        .2s;
+
+}
+
+
+button:hover {
+
+    transform:
+        translateY(-2px);
+
+    filter:
+        brightness(1.1);
+
+}
+
+
+button:active {
+
+    transform:
+        translateY(0);
+
+}
+
+
+.secondary {
+
+    background:
+        #292431;
+
+}
+
+
+.red {
+
+    background:
+        linear-gradient(
+            135deg,
+            #ef4444,
+            #991b1b
+        );
+
+}
+
+
+.green {
+
+    background:
+        linear-gradient(
+            135deg,
+            #10b981,
+            #047857
+        );
+
+}
+
+
+.blue {
+
+    background:
+        linear-gradient(
+            135deg,
+            #3b82f6,
+            #1d4ed8
+        );
+
+}
+
+
+.actions {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 15px;
+
+}
+
+
+.error {
+
+    min-height: 22px;
+
+    margin-top: 12px;
+
+    color:
+        #fb7185;
+
+}
+
+
+/* ============================================================
+   GAME
+   ============================================================ */
+
+.hidden {
+
+    display: none !important;
+
+}
+
+
+.game-top {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1.3fr
+        130px;
+
+    gap: 15px;
+
+    align-items: center;
+
+}
+
+
+.label {
+
+    color:
+        #81788d;
+
+    font-size: 11px;
+
+    letter-spacing: 2px;
+
+}
+
+
+.room-code {
+
+    font-size: 32px;
+
+    font-weight: 900;
+
+    letter-spacing: 8px;
+
+}
+
+
+.phase {
+
+    text-align: center;
+
+    font-size: 22px;
+
+    font-weight: 900;
+
+}
+
+
+.my-role {
+
+    text-align: center;
+
+    margin-top: 6px;
+
+    color:
+        #bca7ff;
+
+    font-weight: 700;
+
+}
+
+
+.timer {
+
+    font-size: 34px;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    padding: 12px;
+
+    border-radius: 16px;
+
+    background:
+        #0e0c14;
+
+}
+
+
+.announcement {
+
+    margin-top: 20px;
+
+    padding: 17px;
+
+    text-align: center;
+
+    border-radius: 16px;
+
+    background:
+        rgba(124,58,237,.10);
+
+    border:
+        1px solid
+        rgba(124,58,237,.25);
+
+    color:
+        #d9d2e4;
+
+}
+
+
+/* ============================================================
+   GRID
+   ============================================================ */
+
+.grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1.3fr
+        .7fr;
+
+    gap: 20px;
+
+    margin-top: 20px;
+
+}
+
+
+/* ============================================================
+   PLAYERS
+   ============================================================ */
+
+.players {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                190px,
+                1fr
+            )
+        );
+
+    gap: 12px;
+
+}
+
+
+.player {
+
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 16px;
+
+    border-radius: 17px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #1b1724,
+            #111018
         );
 
     border:
         1px solid
-        rgba(255,255,255,0.08);
+        rgba(255,255,255,.06);
+
+    transition:
+        .2s;
+
 }
 
-.result h2 {
-    text-align: center;
+
+.player:hover {
+
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(139,92,246,.35);
+
 }
 
-.role-list {
+
+.player.dead {
+
+    opacity: .42;
+
+    filter:
+        grayscale(.7);
+
+}
+
+
+.player-top {
+
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+
+    align-items: center;
+
+    gap: 12px;
+
 }
 
-.role-player {
+
+.avatar {
+
+    width: 44px;
+
+    height: 44px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 22px;
+
+    background:
+        #292431;
+
+}
+
+
+.player-name {
+
+    font-weight: 800;
+
+}
+
+
+.host {
+
+    color:
+        #facc15;
+
+    font-size: 11px;
+
+    margin-top: 4px;
+
+}
+
+
+.status {
+
+    margin-top: 12px;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+}
+
+
+.alive {
+
+    color:
+        #34d399;
+
+}
+
+
+.dead-status {
+
+    color:
+        #fb7185;
+
+}
+
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.action-list {
+
+    display: grid;
+
+    gap: 8px;
+
+    margin-top: 15px;
+
+}
+
+
+.action-list button {
+
+    width: 100%;
+
+    text-align: left;
+
+}
+
+
+.action-title {
+
+    margin-top: 20px;
+
+    color:
+        #bcb2c8;
+
+    font-weight: 800;
+
+}
+
+
+/* ============================================================
+   LOG
+   ============================================================ */
+
+.log {
+
+    max-height: 470px;
+
+    overflow-y: auto;
+
+}
+
+
+.log-item {
+
+    padding: 12px 0;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.06);
+
+    color:
+        #aaa1b0;
+
+    font-size: 14px;
+
+}
+
+
+/* ============================================================
+   RESULT
+   ============================================================ */
+
+.result {
+
+    margin-top: 20px;
+
+    padding: 24px;
+
+    border-radius: 20px;
+
+    background:
+        radial-gradient(
+            circle at top,
+            rgba(124,58,237,.2),
+            rgba(10,9,14,.3)
+        );
+
+    border:
+        1px solid
+        rgba(139,92,246,.25);
+
+}
+
+
+.result-title {
+
+    text-align: center;
+
+    font-size: 30px;
+
+    font-weight: 900;
+
+    margin-bottom: 20px;
+
+}
+
+
+.roles {
+
+    display: grid;
+
+    gap: 9px;
+
+}
+
+
+.role-row {
+
     display: flex;
 
     justify-content: space-between;
 
-    padding: 12px;
+    align-items: center;
 
-    background: #17131f;
+    padding: 13px 15px;
 
-    border-radius: 10px;
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,.04);
+
 }
 
-.mafia-role {
-    color: #ff6b6b;
-    font-weight: bold;
+
+.role-mafia {
+
+    color:
+        #fb7185;
+
+    font-weight: 900;
+
 }
 
-.citizen-role {
-    color: #6ee7b7;
-    font-weight: bold;
+
+.role-neutral {
+
+    color:
+        #facc15;
+
+    font-weight: 900;
+
 }
 
-@media (max-width: 750px) {
+
+.role-good {
+
+    color:
+        #34d399;
+
+    font-weight: 900;
+
+}
+
+
+/* ============================================================
+   LOBBY INFO
+   ============================================================ */
+
+.lobby-info {
+
+    margin-top: 15px;
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,255,255,.035);
+
+    color:
+        #a9a0b0;
+
+    font-size: 14px;
+
+}
+
+
+.copy {
+
+    margin-top: 10px;
+
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media(max-width: 800px) {
+
+    .game-top {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .phase {
+
+        text-align:
+            left;
+
+    }
+
+    .my-role {
+
+        text-align:
+            left;
+
+    }
 
     .grid {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+            1fr;
+
     }
 
-    .topbar {
-        grid-template-columns: 1fr;
-    }
+    .inputs {
 
-    .timer {
-        text-align: left;
+        grid-template-columns:
+            1fr;
+
     }
 
 }
@@ -396,16 +899,45 @@ button:active {
 
 <body>
 
+
 <div class="container">
 
-<h1>🔪 МАФИЯ</h1>
+
+<div class="logo">
+
+    <h1>MAFIA</h1>
+
+    <p>
+        NIGHT • LIES • SURVIVAL
+    </p>
+
+</div>
 
 
-<div id="homeScreen" class="card">
+<!-- =========================================================
+     LOGIN
+     ========================================================= -->
 
-    <h2>Войти в игру</h2>
+<div
+    id="login"
+    class="card login"
+>
 
-    <div class="row">
+    <h2>
+        🔥 Добро пожаловать
+    </h2>
+
+    <p
+        style="
+            text-align:center;
+            color:#8f8798;
+        "
+    >
+        Создай комнату или присоединись к друзьям
+    </p>
+
+
+    <div class="inputs">
 
         <input
             id="name"
@@ -416,157 +948,205 @@ button:active {
         <input
             id="room"
             maxlength="4"
-            placeholder="Код комнаты"
+            placeholder="Код"
         >
 
     </div>
 
+
     <div class="actions">
 
-        <button onclick="createRoom()">
-            Создать комнату
+        <button
+            onclick="createRoom()"
+            style="flex:1"
+        >
+            ✨ Создать комнату
         </button>
 
         <button
             class="secondary"
             onclick="joinRoom()"
+            style="flex:1"
         >
-            Войти в комнату
+            🚪 Войти
         </button>
 
     </div>
 
+
     <div
-        id="homeError"
+        id="loginError"
         class="error"
     ></div>
+
+
+    <div class="lobby-info">
+
+        <b>Система ролей</b><br><br>
+
+        4–5 игроков →
+        Мафия / Доктор / Шериф<br>
+
+        6–7 игроков →
+        2 Мафии / Доктор / Шериф<br>
+
+        8–9 игроков →
+        Дон / Телохранитель<br>
+
+        10–12 игроков →
+        Маньяк / Детектив
+
+    </div>
 
 </div>
 
 
+<!-- =========================================================
+     GAME
+     ========================================================= -->
+
 <div
-    id="gameScreen"
+    id="game"
     class="hidden"
 >
 
-    <div class="card">
 
-        <div class="topbar">
+<div class="card">
 
-            <div>
+    <div class="game-top">
 
-                <div class="small">
-                    КОМНАТА
-                </div>
+        <div>
 
-                <div
-                    id="roomCode"
-                    class="room-code"
-                >
-                    ----
-                </div>
-
+            <div class="label">
+                КОД КОМНАТЫ
             </div>
-
-
-            <div>
-
-                <div
-                    id="phase"
-                    class="phase"
-                >
-                    ЛОББИ
-                </div>
-
-                <div
-                    id="myRole"
-                    class="role"
-                >
-                    Роль пока не назначена
-                </div>
-
-            </div>
-
 
             <div
-                id="timer"
-                class="timer"
+                id="roomCode"
+                class="room-code"
             >
-                --
+                ----
+            </div>
+
+            <button
+                class="secondary copy"
+                onclick="copyRoom()"
+            >
+                📋 Скопировать код
+            </button>
+
+        </div>
+
+
+        <div>
+
+            <div
+                id="phase"
+                class="phase"
+            >
+                ЛОББИ
+            </div>
+
+            <div
+                id="myRole"
+                class="my-role"
+            >
+                Роль не назначена
             </div>
 
         </div>
 
 
         <div
-            id="announcement"
-            class="announcement"
+            id="timer"
+            class="timer"
         >
-            Ожидание игроков...
+            --
         </div>
 
     </div>
 
 
-    <div class="grid">
-
-        <div class="card">
-
-            <h3>
-                👥 Игроки
-            </h3>
-
-            <div
-                id="players"
-                class="players"
-            ></div>
-
-
-            <div
-                id="hostControls"
-                class="actions hidden"
-            >
-
-                <button
-                    id="startButton"
-                    onclick="startGame()"
-                >
-                    ▶ Начать игру
-                </button>
-
-            </div>
-
-
-            <div
-                id="actions"
-                class="actions"
-            ></div>
-
-
-            <div
-                id="result"
-                class="result hidden"
-            ></div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                📜 События
-            </h3>
-
-            <div
-                id="log"
-                class="log"
-            ></div>
-
-        </div>
-
+    <div
+        id="announcement"
+        class="announcement"
+    >
+        Ожидание игроков...
     </div>
 
 </div>
+
+
+<div class="grid">
+
+
+<!-- =========================================================
+     LEFT
+     ========================================================= -->
+
+<div class="card">
+
+    <h2>
+        👥 Игроки
+    </h2>
+
+    <div
+        id="players"
+        class="players"
+    ></div>
+
+
+    <div
+        id="hostControls"
+        class="actions hidden"
+    >
+
+        <button
+            id="startButton"
+            onclick="startGame()"
+        >
+            ▶ Начать игру
+        </button>
+
+    </div>
+
+
+    <div
+        id="actions"
+    ></div>
+
+
+    <div
+        id="result"
+        class="result hidden"
+    ></div>
+
+</div>
+
+
+<!-- =========================================================
+     RIGHT
+     ========================================================= -->
+
+<div class="card">
+
+    <h2>
+        📜 События
+    </h2>
+
+    <div
+        id="log"
+        class="log"
+    ></div>
+
+</div>
+
+
+</div>
+
+
+</div>
+
 
 </div>
 
@@ -577,30 +1157,95 @@ let socket = null;
 
 let myName = "";
 
-let currentState = null;
+let state = null;
 
 
 // ============================================================
-// СОЗДАНИЕ КОМНАТЫ
+// CREATE ROOM
 // ============================================================
 
 async function createRoom() {
 
-    const response =
-        await fetch("/create");
+    const name =
+        document
+        .getElementById("name")
+        .value
+        .trim();
 
-    const data =
-        await response.json();
+    const error =
+        document
+        .getElementById("loginError");
 
-    document.getElementById("room").value =
-        data.room;
+    error.textContent = "";
 
-    joinRoom();
+
+    if (!name) {
+
+        error.textContent =
+            "Сначала введи имя.";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/create?x=" +
+                Date.now()
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Ошибка сервера: " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.room) {
+
+            throw new Error(
+                "Код комнаты не получен."
+            );
+
+        }
+
+
+        document
+            .getElementById("room")
+            .value =
+            data.room;
+
+
+        joinRoom();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        document
+            .getElementById("loginError")
+            .textContent =
+            "Не удалось создать комнату.";
+
+    }
+
 }
 
 
 // ============================================================
-// ВХОД
+// JOIN
 // ============================================================
 
 function joinRoom() {
@@ -611,6 +1256,7 @@ function joinRoom() {
         .value
         .trim();
 
+
     const room =
         document
         .getElementById("room")
@@ -618,8 +1264,11 @@ function joinRoom() {
         .trim()
         .toUpperCase();
 
+
     const error =
-        document.getElementById("homeError");
+        document
+        .getElementById("loginError");
+
 
     error.textContent = "";
 
@@ -630,6 +1279,7 @@ function joinRoom() {
             "Введи имя.";
 
         return;
+
     }
 
 
@@ -639,14 +1289,24 @@ function joinRoom() {
             "Введи код комнаты.";
 
         return;
+
     }
 
 
     myName = name;
 
 
+    const protocol =
+        location.protocol === "https:"
+            ? "wss:"
+            : "ws:";
+
+
     socket = new WebSocket(
-        `ws://${location.host}/ws`
+        protocol +
+        "//" +
+        location.host +
+        "/ws"
     );
 
 
@@ -655,11 +1315,14 @@ function joinRoom() {
         socket.send(
             JSON.stringify({
 
-                type: "join",
+                type:
+                    "join",
 
-                name: name,
+                name:
+                    name,
 
-                room: room
+                room:
+                    room
 
             })
         );
@@ -667,39 +1330,49 @@ function joinRoom() {
     };
 
 
-    socket.onmessage = function(event) {
+    socket.onmessage =
+        function(event) {
 
         const data =
-            JSON.parse(event.data);
+            JSON.parse(
+                event.data
+            );
 
 
-        if (data.type === "error") {
+        if (
+            data.type ===
+            "error"
+        ) {
 
             error.textContent =
                 data.message;
 
             return;
+
         }
 
 
-        if (data.type === "state") {
+        if (
+            data.type ===
+            "state"
+        ) {
 
-            currentState = data;
+            state = data;
 
             showGame();
 
-            renderState(data);
+            render(data);
 
         }
 
     };
 
 
-    socket.onclose = function() {
+    socket.onerror =
+        function() {
 
-        console.log(
-            "Соединение закрыто."
-        );
+        error.textContent =
+            "Ошибка подключения к серверу.";
 
     };
 
@@ -707,18 +1380,19 @@ function joinRoom() {
 
 
 // ============================================================
-// ПОКАЗ ИГРЫ
+// SHOW GAME
 // ============================================================
 
 function showGame() {
 
     document
-        .getElementById("homeScreen")
+        .getElementById("login")
         .classList
         .add("hidden");
 
+
     document
-        .getElementById("gameScreen")
+        .getElementById("game")
         .classList
         .remove("hidden");
 
@@ -726,73 +1400,91 @@ function showGame() {
 
 
 // ============================================================
-// ОТОБРАЖЕНИЕ СОСТОЯНИЯ
+// RENDER
 // ============================================================
 
-function renderState(state) {
+function render(data) {
+
 
     document
         .getElementById("roomCode")
         .textContent =
-        state.room;
+        data.room;
 
 
     document
         .getElementById("phase")
         .textContent =
-        state.phase;
+        data.phase;
 
 
     document
         .getElementById("timer")
         .textContent =
-        state.time > 0
-            ? state.time
+        data.time > 0
+            ? data.time
             : "--";
 
 
     document
         .getElementById("announcement")
         .textContent =
-        state.announcement;
+        data.announcement;
 
 
-    // ========================================================
-    // МОЯ РОЛЬ
-    // ========================================================
-
-    const roleElement =
-        document.getElementById("myRole");
+    const role =
+        document
+        .getElementById("myRole");
 
 
-    if (state.role) {
+    if (data.role) {
 
-        roleElement.textContent =
-            "Твоя роль: " +
-            state.role;
+        role.textContent =
+            "🎭 Твоя роль: " +
+            data.role;
 
     } else {
 
-        roleElement.textContent =
-            "Роль пока не назначена";
+        role.textContent =
+            "Роль не назначена";
 
     }
 
 
-    // ========================================================
-    // ИГРОКИ
-    // ========================================================
+    renderPlayers(data);
 
-    const playersElement =
-        document.getElementById("players");
+    renderHost(data);
 
-    playersElement.innerHTML = "";
+    renderActions(data);
+
+    renderLog(data);
+
+    renderResult(data);
+
+}
 
 
-    state.players.forEach(player => {
+// ============================================================
+// PLAYERS
+// ============================================================
+
+function renderPlayers(data) {
+
+    const box =
+        document
+        .getElementById("players");
+
+    box.innerHTML = "";
+
+
+    data.players.forEach(
+        player => {
 
         const div =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         div.className =
             "player " +
@@ -803,128 +1495,63 @@ function renderState(state) {
             );
 
 
-        const name =
-            document.createElement("span");
-
-        name.className =
-            "player-name";
-
-        name.textContent =
-            player.name;
-
-
-        const badge =
-            document.createElement("span");
-
-        badge.className =
-            "badge " +
-            (
-                player.alive
-                    ? "alive"
-                    : "dead-badge"
-            );
-
-        badge.textContent =
+        const avatar =
             player.alive
-                ? "Жив"
-                : "Мёртв";
+                ? "👤"
+                : "💀";
 
 
-        div.appendChild(name);
+        div.innerHTML = `
 
-        div.appendChild(badge);
+            <div class="player-top">
 
-        playersElement.appendChild(div);
+                <div class="avatar">
+                    ${avatar}
+                </div>
 
-    });
+                <div>
 
+                    <div class="player-name">
+                        ${escapeHtml(player.name)}
+                    </div>
 
-    // ========================================================
-    // ХОСТ
-    // ========================================================
+                    ${
+                        player.name === data.host
+                        ?
+                        `
+                        <div class="host">
+                            👑 ХОСТ
+                        </div>
+                        `
+                        :
+                        ""
+                    }
 
-    const hostControls =
-        document
-        .getElementById("hostControls");
+                </div>
 
+            </div>
 
-    if (
-        state.host === myName
-        &&
-        (
-            state.phase === "ЛОББИ"
-            ||
-            state.phase === "🏆 ПОБЕДА"
-        )
-    ) {
+            <div
+                class="status
+                ${
+                    player.alive
+                        ? "alive"
+                        : "dead-status"
+                }"
+            >
 
-        hostControls
-            .classList
-            .remove("hidden");
+                ${
+                    player.alive
+                        ? "● ЖИВ"
+                        : "✕ МЁРТ"
+                }
 
-    } else {
+            </div>
 
-        hostControls
-            .classList
-            .add("hidden");
-
-    }
-
-
-    const startButton =
-        document
-        .getElementById("startButton");
-
-
-    if (state.phase === "🏆 ПОБЕДА") {
-
-        startButton.textContent =
-            "🔄 Начать заново";
-
-    } else {
-
-        startButton.textContent =
-            "▶ Начать игру";
-
-    }
+        `;
 
 
-    // ========================================================
-    // ДЕЙСТВИЯ
-    // ========================================================
-
-    renderActions(state);
-
-
-    // ========================================================
-    // РЕЗУЛЬТАТ
-    // ========================================================
-
-    renderResult(state);
-
-
-    // ========================================================
-    // ЛОГ
-    // ========================================================
-
-    const logElement =
-        document.getElementById("log");
-
-    logElement.innerHTML = "";
-
-
-    state.log.forEach(item => {
-
-        const div =
-            document.createElement("div");
-
-        div.className =
-            "log-item";
-
-        div.textContent =
-            item;
-
-        logElement.appendChild(div);
+        box.appendChild(div);
 
     });
 
@@ -932,25 +1559,84 @@ function renderState(state) {
 
 
 // ============================================================
-// ДЕЙСТВИЯ
+// HOST
 // ============================================================
 
-function renderActions(state) {
+function renderHost(data) {
 
-    const actions =
-        document.getElementById("actions");
+    const controls =
+        document
+        .getElementById(
+            "hostControls"
+        );
 
-    actions.innerHTML = "";
+
+    const button =
+        document
+        .getElementById(
+            "startButton"
+        );
 
 
-    if (!state.role) {
+    if (
+        data.host === myName
+        &&
+        (
+            data.phase === "ЛОББИ"
+            ||
+            data.phase === "🏆 ПОБЕДА"
+        )
+    ) {
 
-        return;
+        controls
+            .classList
+            .remove("hidden");
+
+
+        if (
+            data.phase ===
+            "🏆 ПОБЕДА"
+        ) {
+
+            button.textContent =
+                "🔄 Начать заново";
+
+        } else {
+
+            button.textContent =
+                "▶ Начать игру";
+
+        }
+
+    } else {
+
+        controls
+            .classList
+            .add("hidden");
+
     }
+
+}
+
+
+// ============================================================
+// ACTIONS
+// ============================================================
+
+function renderActions(data) {
+
+    const box =
+        document
+        .getElementById(
+            "actions"
+        );
+
+
+    box.innerHTML = "";
 
 
     const me =
-        state.players.find(
+        data.players.find(
             p => p.name === myName
         );
 
@@ -958,68 +1644,53 @@ function renderActions(state) {
     if (!me || !me.alive) {
 
         return;
+
     }
 
 
     // ========================================================
-    // УБИЙСТВО МАФИИ
+    // MAFIA
     // ========================================================
 
     if (
-        state.phase === "🌙 НОЧЬ — МАФИЯ"
+        data.phase ===
+        "🌙 НОЧЬ — МАФИЯ"
         &&
-        state.role === "Мафия"
+        (
+            data.role === "Мафия"
+            ||
+            data.role === "Дон"
+        )
     ) {
 
-        const title =
-            document.createElement("h3");
-
-        title.textContent =
-            "🔪 Выбери жертву";
-
-        actions.appendChild(title);
+        addTitle(
+            box,
+            "🔪 Выбери жертву"
+        );
 
 
-        state.players.forEach(player => {
+        data.players.forEach(
+            player => {
 
             if (
-                player.name === myName
-                ||
                 !player.alive
+                ||
+                player.name === myName
             ) {
 
                 return;
+
             }
 
 
-            const button =
-                document.createElement("button");
-
-            button.className =
-                "action-button danger";
-
-            button.textContent =
-                "Убить: " +
-                player.name;
-
-
-            button.onclick = function() {
-
-                socket.send(
-                    JSON.stringify({
-
-                        type: "kill",
-
-                        target:
-                            player.name
-
-                    })
-                );
-
-            };
-
-
-            actions.appendChild(button);
+            addAction(
+                box,
+                "🔪 Убить " +
+                player.name,
+                "kill",
+                player.name,
+                "red"
+            );
 
         });
 
@@ -1027,62 +1698,264 @@ function renderActions(state) {
 
 
     // ========================================================
-    // ГОЛОСОВАНИЕ
+    // MANIAC
     // ========================================================
 
     if (
-        state.phase === "🗳️ ГОЛОСОВАНИЕ"
+        data.phase ===
+        "🌙 НОЧЬ — МАФИЯ"
+        &&
+        data.role ===
+        "Маньяк"
     ) {
 
-        const title =
-            document.createElement("h3");
-
-        title.textContent =
-            "🗳️ За кого голосовать?";
-
-        actions.appendChild(title);
+        addTitle(
+            box,
+            "🔪 Маньяк выбирает жертву"
+        );
 
 
-        state.players.forEach(player => {
+        data.players.forEach(
+            player => {
 
             if (
-                player.name === myName
-                ||
                 !player.alive
+                ||
+                player.name === myName
             ) {
 
                 return;
+
             }
 
 
-            const button =
-                document.createElement("button");
+            addAction(
+                box,
+                "🔪 Убить " +
+                player.name,
+                "maniac_kill",
+                player.name,
+                "red"
+            );
 
-            button.className =
-                "action-button";
+        });
 
-            button.textContent =
-                "Голосовать против " +
-                player.name;
-
-
-            button.onclick = function() {
-
-                socket.send(
-                    JSON.stringify({
-
-                        type: "vote",
-
-                        target:
-                            player.name
-
-                    })
-                );
-
-            };
+    }
 
 
-            actions.appendChild(button);
+    // ========================================================
+    // DOCTOR
+    // ========================================================
+
+    if (
+        data.phase ===
+        "🌙 НОЧЬ — МАФИЯ"
+        &&
+        data.role ===
+        "Доктор"
+    ) {
+
+        addTitle(
+            box,
+            "🩺 Кого лечить?"
+        );
+
+
+        data.players.forEach(
+            player => {
+
+            if (!player.alive) {
+
+                return;
+
+            }
+
+
+            addAction(
+                box,
+                "🩺 Лечить " +
+                player.name,
+                "heal",
+                player.name,
+                "green"
+            );
+
+        });
+
+    }
+
+
+    // ========================================================
+    // BODYGUARD
+    // ========================================================
+
+    if (
+        data.phase ===
+        "🌙 НОЧЬ — МАФИЯ"
+        &&
+        data.role ===
+        "Телохранитель"
+    ) {
+
+        addTitle(
+            box,
+            "🛡️ Кого защищать?"
+        );
+
+
+        data.players.forEach(
+            player => {
+
+            if (!player.alive) {
+
+                return;
+
+            }
+
+
+            addAction(
+                box,
+                "🛡️ Защитить " +
+                player.name,
+                "protect",
+                player.name,
+                "blue"
+            );
+
+        });
+
+    }
+
+
+    // ========================================================
+    // SHERIFF
+    // ========================================================
+
+    if (
+        data.phase ===
+        "🌙 НОЧЬ — МАФИЯ"
+        &&
+        data.role ===
+        "Шериф"
+    ) {
+
+        addTitle(
+            box,
+            "🕵️ Кого проверить?"
+        );
+
+
+        data.players.forEach(
+            player => {
+
+            if (
+                !player.alive
+                ||
+                player.name === myName
+            ) {
+
+                return;
+
+            }
+
+
+            addAction(
+                box,
+                "🕵️ Проверить " +
+                player.name,
+                "inspect",
+                player.name,
+                "blue"
+            );
+
+        });
+
+    }
+
+
+    // ========================================================
+    // DETECTIVE
+    // ========================================================
+
+    if (
+        data.phase ===
+        "🌙 НОЧЬ — МАФИЯ"
+        &&
+        data.role ===
+        "Детектив"
+    ) {
+
+        addTitle(
+            box,
+            "🔎 Исследовать игрока"
+        );
+
+
+        data.players.forEach(
+            player => {
+
+            if (
+                !player.alive
+                ||
+                player.name === myName
+            ) {
+
+                return;
+
+            }
+
+
+            addAction(
+                box,
+                "🔎 Узнать роль " +
+                player.name,
+                "detect",
+                player.name,
+                "blue"
+            );
+
+        });
+
+    }
+
+
+    // ========================================================
+    // VOTING
+    // ========================================================
+
+    if (
+        data.phase ===
+        "🗳️ ГОЛОСОВАНИЕ"
+    ) {
+
+        addTitle(
+            box,
+            "🗳️ За кого голосовать?"
+        );
+
+
+        data.players.forEach(
+            player => {
+
+            if (
+                !player.alive
+                ||
+                player.name === myName
+            ) {
+
+                return;
+
+            }
+
+
+            addAction(
+                box,
+                "🗳️ Против " +
+                player.name,
+                "vote",
+                player.name,
+                ""
+            );
 
         });
 
@@ -1092,100 +1965,286 @@ function renderActions(state) {
 
 
 // ============================================================
-// ПОКАЗ ВСЕХ РОЛЕЙ ПОСЛЕ ИГРЫ
+// ACTION BUTTON
 // ============================================================
 
-function renderResult(state) {
+function addAction(
+    box,
+    text,
+    type,
+    target,
+    color
+) {
 
-    const result =
-        document.getElementById("result");
+    const button =
+        document.createElement(
+            "button"
+        );
 
 
-    if (state.phase !== "🏆 ПОБЕДА") {
+    button.textContent =
+        text;
 
-        result
-            .classList
-            .add("hidden");
 
-        result.innerHTML = "";
+    if (color) {
 
-        return;
+        button.classList.add(color);
+
     }
 
 
-    result
-        .classList
-        .remove("hidden");
+    button.onclick =
+        function() {
+
+        if (!socket) {
+
+            return;
+
+        }
+
+
+        socket.send(
+            JSON.stringify({
+
+                type:
+                    type,
+
+                target:
+                    target
+
+            })
+        );
+
+    };
+
+
+    box.appendChild(button);
+
+}
+
+
+// ============================================================
+// TITLE
+// ============================================================
+
+function addTitle(
+    box,
+    text
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.className =
+        "action-title";
+
+
+    div.textContent =
+        text;
+
+
+    box.appendChild(div);
+
+}
+
+
+// ============================================================
+// LOG
+// ============================================================
+
+function renderLog(data) {
+
+    const box =
+        document
+        .getElementById("log");
+
+
+    box.innerHTML = "";
+
+
+    data.log.forEach(
+        item => {
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.className =
+            "log-item";
+
+
+        div.textContent =
+            item;
+
+
+        box.appendChild(div);
+
+    });
+
+}
+
+
+// ============================================================
+// RESULT
+// ============================================================
+
+function renderResult(data) {
+
+    const box =
+        document
+        .getElementById(
+            "result"
+        );
+
+
+    if (
+        data.phase !==
+        "🏆 ПОБЕДА"
+    ) {
+
+        box.classList.add(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    box.classList.remove(
+        "hidden"
+    );
 
 
     let html = "";
 
-    html += "<h2>🏆 Игра окончена</h2>";
 
-    html +=
-        "<p style='text-align:center'>" +
-        state.announcement +
-        "</p>";
+    html += `
+
+        <div class="result-title">
+            🏆 ИГРА ОКОНЧЕНА
+        </div>
+
+        <div
+            style="
+                text-align:center;
+                color:#aaa0b1;
+                margin-bottom:20px;
+            "
+        >
+            ${escapeHtml(data.announcement)}
+        </div>
+
+        <h3>
+            🎭 Все роли
+        </h3>
+
+        <div class="roles">
+
+    `;
 
 
-    html +=
-        "<h3>🎭 Роли игроков</h3>";
+    if (data.roles) {
+
+        data.roles.forEach(
+            player => {
+
+            let cls =
+                "role-good";
 
 
-    html +=
-        "<div class='role-list'>";
+            if (
+                player.role ===
+                "Мафия"
+                ||
+                player.role ===
+                "Дон"
+            ) {
+
+                cls =
+                    "role-mafia";
+
+            }
 
 
-    if (state.roles) {
+            if (
+                player.role ===
+                "Маньяк"
+            ) {
 
-        state.roles.forEach(player => {
+                cls =
+                    "role-neutral";
 
-            const roleClass =
-                player.role === "Мафия"
-                    ? "mafia-role"
-                    : "citizen-role";
+            }
 
 
-            html +=
-                "<div class='role-player'>" +
+            html += `
 
-                "<span>" +
-                escapeHtml(player.name) +
-                "</span>" +
+                <div class="role-row">
 
-                "<span class='" +
-                roleClass +
-                "'>" +
-                escapeHtml(player.role) +
-                "</span>" +
+                    <span>
+                        ${escapeHtml(player.name)}
+                    </span>
 
-                "</div>";
+                    <span
+                        class="${cls}"
+                    >
+                        ${escapeHtml(player.role)}
+                    </span>
+
+                </div>
+
+            `;
 
         });
 
     }
 
 
-    html += "</div>";
+    html += `
+        </div>
+    `;
 
 
-    if (state.host === myName) {
-
-        html +=
-            "<p style='text-align:center;margin-top:15px'>" +
-            "Ты можешь запустить новую игру." +
-            "</p>";
-
-    }
-
-
-    result.innerHTML = html;
+    box.innerHTML =
+        html;
 
 }
 
 
 // ============================================================
-// ЗАПУСК / РЕСТАРТ
+// COPY
+// ============================================================
+
+function copyRoom() {
+
+    if (!state) {
+
+        return;
+
+    }
+
+
+    navigator.clipboard.writeText(
+        state.room
+    );
+
+
+    alert(
+        "Код комнаты скопирован: " +
+        state.room
+    );
+
+}
+
+
+// ============================================================
+// START / RESTART
 // ============================================================
 
 function startGame() {
@@ -1193,13 +2252,15 @@ function startGame() {
     if (!socket) {
 
         return;
+
     }
 
 
     socket.send(
         JSON.stringify({
 
-            type: "start"
+            type:
+                "start"
 
         })
     );
@@ -1208,17 +2269,32 @@ function startGame() {
 
 
 // ============================================================
-// ЗАЩИТА HTML
+// ESCAPE
 // ============================================================
 
 function escapeHtml(text) {
 
     return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 
 }
 
@@ -1231,7 +2307,7 @@ function escapeHtml(text) {
 
 
 # ============================================================
-# СОЗДАНИЕ КОДА КОМНАТЫ
+# ROOM CODE
 # ============================================================
 
 def generate_room_code():
@@ -1239,7 +2315,9 @@ def generate_room_code():
     while True:
 
         code = "".join(
-            random.choice(string.digits)
+            random.choice(
+                string.digits
+            )
             for _ in range(4)
         )
 
@@ -1249,20 +2327,163 @@ def generate_room_code():
 
 
 # ============================================================
-# СОСТОЯНИЕ КОМНАТЫ
+# TIME
 # ============================================================
 
-def get_state(room, player_name):
+def now():
 
-    player = room["players"].get(
-        player_name
-    )
-
-
-    current_time = (
+    return (
         asyncio
         .get_running_loop()
         .time()
+    )
+
+
+# ============================================================
+# ROLE SET
+# ============================================================
+
+def get_roles_for_players(count):
+
+    if count < 4:
+
+        return None
+
+
+    if count <= 5:
+
+        return [
+            "Мафия",
+            "Доктор",
+            "Шериф"
+        ]
+
+
+    if count <= 7:
+
+        return [
+            "Мафия",
+            "Мафия",
+            "Доктор",
+            "Шериф"
+        ]
+
+
+    if count <= 9:
+
+        return [
+            "Мафия",
+            "Мафия",
+            "Дон",
+            "Доктор",
+            "Шериф",
+            "Телохранитель"
+        ]
+
+
+    if count <= 11:
+
+        return [
+            "Мафия",
+            "Мафия",
+            "Дон",
+            "Доктор",
+            "Шериф",
+            "Телохранитель",
+            "Маньяк"
+        ]
+
+
+    return [
+        "Мафия",
+        "Мафия",
+        "Дон",
+        "Доктор",
+        "Шериф",
+        "Телохранитель",
+        "Маньяк",
+        "Детектив"
+    ]
+
+
+# ============================================================
+# ASSIGN ROLES
+# ============================================================
+
+def assign_roles(room):
+
+    players = list(
+        room["players"].values()
+    )
+
+
+    roles = get_roles_for_players(
+        len(players)
+    )
+
+
+    if roles is None:
+
+        return
+
+
+    while len(roles) < len(players):
+
+        roles.append(
+            "Мирный"
+        )
+
+
+    random.shuffle(roles)
+
+
+    random.shuffle(players)
+
+
+    for player, role in zip(
+        players,
+        roles
+    ):
+
+        player["role"] = role
+
+
+# ============================================================
+# MAJOR ROLE CHECKS
+# ============================================================
+
+def is_mafia(player):
+
+    return player["role"] in (
+        "Мафия",
+        "Дон"
+    )
+
+
+def is_alive(room, name):
+
+    player = room["players"].get(
+        name
+    )
+
+    return bool(
+        player
+        and
+        player["alive"]
+    )
+
+
+# ============================================================
+# STATE
+# ============================================================
+
+def get_state(
+    room,
+    player_name
+):
+
+    player = room["players"].get(
+        player_name
     )
 
 
@@ -1275,25 +2496,30 @@ def get_state(room, player_name):
             0,
             int(
                 room["ends"] -
-                current_time
+                now()
             )
         )
 
 
-    # --------------------------------------------------------
-    # Все роли показываем только после победы
-    # --------------------------------------------------------
-
     roles = None
 
 
-    if room["phase"] == "🏆 ПОБЕДА":
+    # Роли становятся видны
+    # только после окончания игры
+
+    if (
+        room["phase"] ==
+        "🏆 ПОБЕДА"
+    ):
 
         roles = [
 
             {
-                "name": p["name"],
-                "role": p["role"]
+                "name":
+                    p["name"],
+
+                "role":
+                    p["role"]
             }
 
             for p in
@@ -1320,22 +2546,14 @@ def get_state(room, player_name):
             remaining,
 
         "role":
-            player.get("role")
+            player["role"]
             if player
             else None,
 
-        "alive":
-            [
-                p["name"]
-
-                for p in
-                room["players"].values()
-
-                if p["alive"]
-            ],
-
         "players":
+
             [
+
                 {
                     "name":
                         p["name"],
@@ -1346,6 +2564,7 @@ def get_state(room, player_name):
 
                 for p in
                 room["players"].values()
+
             ],
 
         "announcement":
@@ -1361,7 +2580,7 @@ def get_state(room, player_name):
 
 
 # ============================================================
-# ОТПРАВКА СОСТОЯНИЯ
+# BROADCAST
 # ============================================================
 
 async def broadcast(room):
@@ -1391,39 +2610,65 @@ async def broadcast(room):
 
 
 # ============================================================
-# ПРОВЕРКА ПОБЕДЫ
+# WINNER
 # ============================================================
 
 def check_winner(room):
 
-    mafia_count = 0
+    alive = [
 
-    citizen_count = 0
+        p
 
-
-    for player in (
+        for p in
         room["players"].values()
-    ):
 
-        if not player["alive"]:
+        if p["alive"]
 
-            continue
-
-
-        if player["role"] == "Мафия":
-
-            mafia_count += 1
-
-        else:
-
-            citizen_count += 1
+    ]
 
 
-    # --------------------------------------------------------
-    # Мирные победили
-    # --------------------------------------------------------
+    mafia = [
 
-    if mafia_count == 0:
+        p
+
+        for p in alive
+
+        if is_mafia(p)
+
+    ]
+
+
+    maniac = [
+
+        p
+
+        for p in alive
+
+        if p["role"] ==
+        "Маньяк"
+
+    ]
+
+
+    citizens = [
+
+        p
+
+        for p in alive
+
+        if not is_mafia(p)
+        and
+        p["role"] !=
+        "Маньяк"
+
+    ]
+
+
+    # ========================================================
+    # МАНЬЯК
+    # ========================================================
+
+    if maniac and len(alive) <= 2:
 
         room["phase"] = (
             "🏆 ПОБЕДА"
@@ -1432,21 +2677,46 @@ def check_winner(room):
         room["ends"] = 0
 
         room["announcement"] = (
-            "Мирные жители победили!"
+            "🔪 Маньяк остался последним!"
         )
 
         room["log"].append(
-            "🏆 Мирные жители победили!"
+            "🔪 Маньяк победил!"
         )
 
         return True
 
 
-    # --------------------------------------------------------
-    # Мафия победила
-    # --------------------------------------------------------
+    # ========================================================
+    # МИРНЫЕ
+    # ========================================================
 
-    if mafia_count >= citizen_count:
+    if len(mafia) == 0:
+
+        if not maniac:
+
+            room["phase"] = (
+                "🏆 ПОБЕДА"
+            )
+
+            room["ends"] = 0
+
+            room["announcement"] = (
+                "🟢 Мирные жители победили!"
+            )
+
+            room["log"].append(
+                "🏆 Победа мирных!"
+            )
+
+            return True
+
+
+    # ========================================================
+    # МАФИЯ
+    # ========================================================
+
+    if len(mafia) >= len(citizens) + len(maniac):
 
         room["phase"] = (
             "🏆 ПОБЕДА"
@@ -1455,7 +2725,7 @@ def check_winner(room):
         room["ends"] = 0
 
         room["announcement"] = (
-            "Мафия победила!"
+            "🔴 Мафия захватила город!"
         )
 
         room["log"].append(
@@ -1469,70 +2739,27 @@ def check_winner(room):
 
 
 # ============================================================
-# РАСПРЕДЕЛЕНИЕ РОЛЕЙ
+# START GAME
 # ============================================================
 
-def assign_roles(room):
+async def start_game(room):
 
-    names = list(
-        room["players"]
-    )
-
-
-    random.shuffle(names)
-
-
-    mafia_count = max(
-        1,
-        len(names) // 4
-    )
-
-
-    for index, name in enumerate(names):
-
-        if index < mafia_count:
-
-            room["players"][
-                name
-            ]["role"] = "Мафия"
-
-        else:
-
-            room["players"][
-                name
-            ]["role"] = "Мирный"
-
-
-# ============================================================
-# НАЧАЛО / РЕСТАРТ ИГРЫ
-# ============================================================
-
-async def start_new_game(room):
-
-    # --------------------------------------------------------
-    # Если старый игровой цикл ещё существует
-    # --------------------------------------------------------
-
-    old_task = room.get(
+    task = room.get(
         "game_task"
     )
 
 
     if (
-        old_task
+        task
         and
-        not old_task.done()
+        not task.done()
         and
-        old_task !=
+        task !=
         asyncio.current_task()
     ):
 
-        old_task.cancel()
+        task.cancel()
 
-
-    # --------------------------------------------------------
-    # Сбрасываем игроков
-    # --------------------------------------------------------
 
     for player in (
         room["players"].values()
@@ -1543,29 +2770,26 @@ async def start_new_game(room):
         player["role"] = None
 
 
-    # --------------------------------------------------------
-    # Очищаем данные прошлой игры
-    # --------------------------------------------------------
-
     room["night_target"] = None
+
+    room["maniac_target"] = None
+
+    room["doctor_target"] = None
+
+    room["bodyguard_target"] = None
 
     room["votes"] = {}
 
+    room["investigations"] = {}
+
+
     room["log"] = [
-        "🎮 Новая игра начинается!"
+        "🎬 Новая игра началась!"
     ]
 
 
-    # --------------------------------------------------------
-    # Назначаем новые роли
-    # --------------------------------------------------------
-
     assign_roles(room)
 
-
-    # --------------------------------------------------------
-    # Начинаем ночь
-    # --------------------------------------------------------
 
     room["phase"] = (
         "🌙 НОЧЬ — МАФИЯ"
@@ -1573,22 +2797,14 @@ async def start_new_game(room):
 
 
     room["ends"] = (
-        asyncio
-        .get_running_loop()
-        .time()
-        + 15
+        now() + 15
     )
 
 
     room["announcement"] = (
-        "Город засыпает. "
-        "Мафия просыпается."
+        "Город засыпает..."
     )
 
-
-    # --------------------------------------------------------
-    # Запускаем игровой цикл
-    # --------------------------------------------------------
 
     room["game_task"] = (
         asyncio.create_task(
@@ -1598,7 +2814,154 @@ async def start_new_game(room):
 
 
 # ============================================================
-# ИГРОВОЙ ЦИКЛ
+# NIGHT RESOLUTION
+# ============================================================
+
+def resolve_night(room):
+
+    deaths = []
+
+
+    protected = set()
+
+
+    if room["doctor_target"]:
+
+        protected.add(
+            room["doctor_target"]
+        )
+
+
+    if room["bodyguard_target"]:
+
+        protected.add(
+            room["bodyguard_target"]
+        )
+
+
+    # ========================================================
+    # MAFIA
+    # ========================================================
+
+    mafia_target = (
+        room["night_target"]
+    )
+
+
+    if (
+        mafia_target
+        and
+        is_alive(
+            room,
+            mafia_target
+        )
+        and
+        mafia_target
+        not in protected
+    ):
+
+        deaths.append(
+            (
+                mafia_target,
+                "Мафия"
+            )
+        )
+
+
+    # ========================================================
+    # MANIAC
+    # ========================================================
+
+    maniac_target = (
+        room["maniac_target"]
+    )
+
+
+    if (
+        maniac_target
+        and
+        is_alive(
+            room,
+            maniac_target
+        )
+        and
+        maniac_target
+        not in protected
+    ):
+
+        if not any(
+            x[0] ==
+            maniac_target
+            for x in deaths
+        ):
+
+            deaths.append(
+                (
+                    maniac_target,
+                    "Маньяк"
+                )
+            )
+
+
+    # ========================================================
+    # APPLY DEATHS
+    # ========================================================
+
+    for (
+        name,
+        killer
+    ) in deaths:
+
+        player = (
+            room["players"]
+            .get(name)
+        )
+
+
+        if (
+            player
+            and
+            player["alive"]
+        ):
+
+            player["alive"] = False
+
+
+            room["log"].append(
+                f"💀 Ночью погиб {name}."
+            )
+
+
+    if deaths:
+
+        room["announcement"] = (
+            "Город просыпается. "
+            "Ночью произошло убийство."
+        )
+
+    else:
+
+        room["announcement"] = (
+            "☀️ Город просыпается. "
+            "Этой ночью никто не погиб."
+        )
+
+
+    # ========================================================
+    # CLEAR NIGHT
+    # ========================================================
+
+    room["night_target"] = None
+
+    room["maniac_target"] = None
+
+    room["doctor_target"] = None
+
+    room["bodyguard_target"] = None
+
+
+# ============================================================
+# GAME LOOP
 # ============================================================
 
 async def game_loop(room):
@@ -1610,18 +2973,10 @@ async def game_loop(room):
             "🏆 ПОБЕДА"
         ):
 
-            now = (
-                asyncio
-                .get_running_loop()
-                .time()
-            )
+            current = now()
 
 
-            # ------------------------------------------------
-            # Ждём окончания текущей фазы
-            # ------------------------------------------------
-
-            if room["ends"] > now:
+            if room["ends"] > current:
 
                 await broadcast(room)
 
@@ -1629,7 +2984,7 @@ async def game_loop(room):
                     min(
                         1,
                         room["ends"] -
-                        now
+                        current
                     )
                 )
 
@@ -1637,7 +2992,7 @@ async def game_loop(room):
 
 
             # =================================================
-            # КОНЕЦ НОЧИ
+            # NIGHT
             # =================================================
 
             if (
@@ -1645,43 +3000,30 @@ async def game_loop(room):
                 "🌙 НОЧЬ — МАФИЯ"
             ):
 
-                target = (
-                    room["night_target"]
+                resolve_night(room)
+
+
+                if check_winner(room):
+
+                    await broadcast(room)
+
+                    return
+
+
+                room["phase"] = (
+                    "☀️ ДЕНЬ"
                 )
 
 
-                if (
-                    target
-                    and
-                    target in room["players"]
-                ):
-
-                    victim = (
-                        room["players"]
-                        [target]
-                    )
+                room["ends"] = (
+                    now() + 8
+                )
 
 
-                    if victim["alive"]:
-
-                        victim["alive"] = False
-
-                        room["announcement"] = (
-                            f"Ночью был убит {target}."
-                        )
-
-                        room["log"].append(
-                            room["announcement"]
-                        )
-
-                else:
-
-                    room["announcement"] = (
-                        "Мафия никого не убила."
-                    )
+                await broadcast(room)
 
 
-                room["night_target"] = None
+                await asyncio.sleep(8)
 
 
                 if check_winner(room):
@@ -1692,34 +3034,7 @@ async def game_loop(room):
 
 
                 # =============================================
-                # ДЕНЬ
-                # =============================================
-
-                room["phase"] = (
-                    "☀️ ДЕНЬ"
-                )
-
-
-                room["ends"] = (
-                    asyncio
-                    .get_running_loop()
-                    .time()
-                    + 8
-                )
-
-
-                room["announcement"] = (
-                    "Город просыпается."
-                )
-
-
-                await broadcast(room)
-
-                await asyncio.sleep(8)
-
-
-                # =============================================
-                # ГОЛОСОВАНИЕ
+                # VOTING
                 # =============================================
 
                 room["phase"] = (
@@ -1728,10 +3043,7 @@ async def game_loop(room):
 
 
                 room["ends"] = (
-                    asyncio
-                    .get_running_loop()
-                    .time()
-                    + 60
+                    now() + 60
                 )
 
 
@@ -1739,7 +3051,7 @@ async def game_loop(room):
 
 
                 room["announcement"] = (
-                    "Началось голосование. "
+                    "🗳️ Началось голосование. "
                     "У вас 60 секунд."
                 )
 
@@ -1748,7 +3060,7 @@ async def game_loop(room):
 
 
             # =================================================
-            # КОНЕЦ ГОЛОСОВАНИЯ
+            # VOTING END
             # =================================================
 
             elif (
@@ -1773,38 +3085,71 @@ async def game_loop(room):
 
                 if counts:
 
-                    victim = max(
-                        counts,
-                        key=counts.get
+                    maximum = max(
+                        counts.values()
                     )
 
 
-                    if (
-                        victim in room["players"]
-                        and
-                        room["players"]
-                        [victim]["alive"]
-                    ):
+                    winners = [
 
-                        room["players"][
-                            victim
-                        ]["alive"] = False
+                        name
 
+                        for name,
+                        count
+                        in counts.items()
+
+                        if count ==
+                        maximum
+
+                    ]
+
+
+                    # Ничья
+
+                    if len(winners) > 1:
 
                         room["announcement"] = (
-                            f"{victim} "
-                            "был изгнан голосованием."
+                            "⚖️ Ничья! "
+                            "Никто не был изгнан."
                         )
-
 
                         room["log"].append(
-                            room["announcement"]
+                            "⚖️ Голоса разделились."
                         )
+
+                    else:
+
+                        victim =
+                        winners[0]
+
+                        if is_alive(
+                            room,
+                            victim
+                        ):
+
+                            room[
+                                "players"
+                            ][
+                                victim
+                            ][
+                                "alive"
+                            ] = False
+
+
+                            room["announcement"] = (
+                                f"⚖️ {victim} "
+                                "был изгнан."
+                            )
+
+
+                            room["log"].append(
+                                room["announcement"]
+                            )
 
                 else:
 
                     room["announcement"] = (
-                        "Никто не был изгнан."
+                        "Никто не проголосовал."
                     )
 
 
@@ -1819,7 +3164,7 @@ async def game_loop(room):
 
 
                 # =============================================
-                # НОВАЯ НОЧЬ
+                # NEXT NIGHT
                 # =============================================
 
                 room["phase"] = (
@@ -1828,31 +3173,26 @@ async def game_loop(room):
 
 
                 room["ends"] = (
-                    asyncio
-                    .get_running_loop()
-                    .time()
-                    + 15
+                    now() + 15
                 )
 
 
                 room["announcement"] = (
-                    "Город засыпает. "
+                    "🌙 Город засыпает. "
                     "Мафия просыпается."
                 )
 
 
                 await broadcast(room)
 
-    except asyncio.CancelledError:
 
-        # Игровой цикл был остановлен
-        # для рестарта игры.
+    except asyncio.CancelledError:
 
         return
 
 
 # ============================================================
-# ГЛАВНАЯ СТРАНИЦА
+# HOME
 # ============================================================
 
 @app.get("/")
@@ -1864,7 +3204,7 @@ async def home():
 
 
 # ============================================================
-# СОЗДАНИЕ КОМНАТЫ
+# CREATE ROOM
 # ============================================================
 
 @app.get("/create")
@@ -1899,7 +3239,19 @@ async def create_room():
         "night_target":
             None,
 
+        "maniac_target":
+            None,
+
+        "doctor_target":
+            None,
+
+        "bodyguard_target":
+            None,
+
         "votes":
+            {},
+
+        "investigations":
             {},
 
         "log":
@@ -1911,8 +3263,15 @@ async def create_room():
     }
 
 
+    print(
+        "Создана комната:",
+        code
+    )
+
+
     return {
-        "room": code
+        "room":
+            code
     }
 
 
@@ -1935,13 +3294,15 @@ async def websocket_endpoint(
 
     try:
 
-        first = (
-            await websocket
-            .receive_json()
-        )
+        first =
+            await websocket.receive_json()
 
 
-        if first.get("type") != "join":
+        if (
+            first.get("type")
+            !=
+            "join"
+        ):
 
             return
 
@@ -1959,7 +3320,7 @@ async def websocket_endpoint(
                 "room",
                 ""
             )
-        ).upper()
+        ).strip().upper()
 
 
         if not player_name:
@@ -1997,10 +3358,9 @@ async def websocket_endpoint(
         ]
 
 
-        if (
-            room["phase"] != "ЛОББИ"
-            and
-            room["phase"] != "🏆 ПОБЕДА"
+        if room["phase"] not in (
+            "ЛОББИ",
+            "🏆 ПОБЕДА"
         ):
 
             await websocket.send_json({
@@ -2009,14 +3369,16 @@ async def websocket_endpoint(
                     "error",
 
                 "message":
-                    "Игра уже началась."
+                    "Игра уже идёт."
 
             })
 
             return
 
 
-        if player_name in room["players"]:
+        if player_name in (
+            room["players"]
+        ):
 
             await websocket.send_json({
 
@@ -2041,7 +3403,7 @@ async def websocket_endpoint(
                     "error",
 
                 "message":
-                    "Комната заполнена."
+                    "Максимум 12 игроков."
 
             })
 
@@ -2049,7 +3411,7 @@ async def websocket_endpoint(
 
 
         # ====================================================
-        # ДОБАВЛЯЕМ ИГРОКА
+        # ADD PLAYER
         # ====================================================
 
         room["players"][
@@ -2073,33 +3435,27 @@ async def websocket_endpoint(
         ] = player_name
 
 
-        # Первый игрок — хост
-
         if room["host"] is None:
 
-            room["host"] = (
+            room["host"] =
                 player_name
-            )
 
 
         await broadcast(room)
 
 
         # ====================================================
-        # КОМАНДЫ
+        # COMMAND LOOP
         # ====================================================
 
         while True:
 
-            data = (
-                await websocket
-                .receive_json()
-            )
+            data =
+                await websocket.receive_json()
 
 
-            command = data.get(
-                "type"
-            )
+            command =
+                data.get("type")
 
 
             # =================================================
@@ -2109,105 +3465,66 @@ async def websocket_endpoint(
             if command == "start":
 
                 if (
-                    player_name !=
+                    player_name
+                    !=
                     room["host"]
                 ):
 
                     continue
 
 
-                # ---------------------------------------------
-                # ОБЫЧНЫЙ СТАРТ
-                # ---------------------------------------------
-
-                if room["phase"] == "ЛОББИ":
-
-                    if len(
-                        room["players"]
-                    ) < 4:
-
-                        await websocket.send_json({
-
-                            "type":
-                                "error",
-
-                            "message":
-                                "Нужно минимум 4 игрока."
-
-                        })
-
-                        continue
-
-
-                    await start_new_game(
-                        room
-                    )
-
-
-                    await broadcast(room)
+                if room["phase"] not in (
+                    "ЛОББИ",
+                    "🏆 ПОБЕДА"
+                ):
 
                     continue
 
 
-                # ---------------------------------------------
-                # РЕСТАРТ ПОСЛЕ ИГРЫ
-                # ---------------------------------------------
+                if len(
+                    room["players"]
+                ) < 4:
 
-                if room["phase"] == "🏆 ПОБЕДА":
+                    await websocket.send_json({
 
-                    if len(
-                        room["players"]
-                    ) < 4:
+                        "type":
+                            "error",
 
-                        await websocket.send_json({
+                        "message":
+                            "Нужно минимум 4 игрока."
 
-                            "type":
-                                "error",
-
-                            "message":
-                                "Нужно минимум 4 игрока."
-
-                        })
-
-                        continue
-
-
-                    await start_new_game(
-                        room
-                    )
-
-
-                    await broadcast(room)
+                    })
 
                     continue
+
+
+                await start_game(
+                    room
+                )
+
+
+                await broadcast(
+                    room
+                )
 
 
             # =================================================
-            # УБИЙСТВО
+            # MAFIA KILL
             # =================================================
 
             elif command == "kill":
 
-                if (
-                    room["phase"] !=
+                if room["phase"] != (
                     "🌙 НОЧЬ — МАФИЯ"
                 ):
 
                     continue
 
 
-                player = (
-                    room["players"]
-                    .get(player_name)
-                )
-
-
-                target_name = str(
-                    data.get(
-                        "target",
-                        ""
+                player =
+                    room["players"].get(
+                        player_name
                     )
-                ).strip()
 
 
                 if not player:
@@ -2220,120 +3537,457 @@ async def websocket_endpoint(
                     continue
 
 
-                if player["role"] != "Мафия":
-
-                    continue
-
-
-                if target_name not in (
-                    room["players"]
+                if not is_mafia(
+                    player
                 ):
 
                     continue
 
 
-                if target_name == player_name:
+                target =
+                    str(
+                        data.get(
+                            "target",
+                            ""
+                        )
+                    ).strip()
+
+
+                if target == player_name:
 
                     continue
 
 
-                target = (
-                    room["players"]
-                    [target_name]
-                )
-
-
-                if not target["alive"]:
+                if not is_alive(
+                    room,
+                    target
+                ):
 
                     continue
 
 
-                room["night_target"] = (
-                    target_name
-                )
+                room[
+                    "night_target"
+                ] = target
 
 
                 room["announcement"] = (
-                    "Мафия выбрала жертву."
+                    "🔪 Мафия выбрала цель."
                 )
 
 
-                await broadcast(room)
+                await broadcast(
+                    room
+                )
 
 
             # =================================================
-            # ГОЛОСОВАНИЕ
+            # MANIAC KILL
+            # =================================================
+
+            elif command == "maniac_kill":
+
+                if room["phase"] != (
+                    "🌙 НОЧЬ — МАФИЯ"
+                ):
+
+                    continue
+
+
+                player =
+                    room["players"].get(
+                        player_name
+                    )
+
+
+                if (
+                    not player
+                    or
+                    not player["alive"]
+                    or
+                    player["role"]
+                    !=
+                    "Маньяк"
+                ):
+
+                    continue
+
+
+                target =
+                    str(
+                        data.get(
+                            "target",
+                            ""
+                        )
+                    ).strip()
+
+
+                if target == player_name:
+
+                    continue
+
+
+                if not is_alive(
+                    room,
+                    target
+                ):
+
+                    continue
+
+
+                room[
+                    "maniac_target"
+                ] = target
+
+
+                await broadcast(
+                    room
+                )
+
+
+            # =================================================
+            # DOCTOR
+            # =================================================
+
+            elif command == "heal":
+
+                if room["phase"] != (
+                    "🌙 НОЧЬ — МАФИЯ"
+                ):
+
+                    continue
+
+
+                player =
+                    room["players"].get(
+                        player_name
+                    )
+
+
+                if (
+                    not player
+                    or
+                    not player["alive"]
+                    or
+                    player["role"]
+                    !=
+                    "Доктор"
+                ):
+
+                    continue
+
+
+                target =
+                    str(
+                        data.get(
+                            "target",
+                            ""
+                        )
+                    ).strip()
+
+
+                if is_alive(
+                    room,
+                    target
+                ):
+
+                    room[
+                        "doctor_target"
+                    ] = target
+
+
+                    room["log"].append(
+                        "🩺 Доктор сделал свой выбор."
+                    )
+
+
+                    await broadcast(
+                        room
+                    )
+
+
+            # =================================================
+            # BODYGUARD
+            # =================================================
+
+            elif command == "protect":
+
+                if room["phase"] != (
+                    "🌙 НОЧЬ — МАФИЯ"
+                ):
+
+                    continue
+
+
+                player =
+                    room["players"].get(
+                        player_name
+                    )
+
+
+                if (
+                    not player
+                    or
+                    not player["alive"]
+                    or
+                    player["role"]
+                    !=
+                    "Телохранитель"
+                ):
+
+                    continue
+
+
+                target =
+                    str(
+                        data.get(
+                            "target",
+                            ""
+                        )
+                    ).strip()
+
+
+                if is_alive(
+                    room,
+                    target
+                ):
+
+                    room[
+                        "bodyguard_target"
+                    ] = target
+
+
+                    await broadcast(
+                        room
+                    )
+
+
+            # =================================================
+            # SHERIFF
+            # =================================================
+
+            elif command == "inspect":
+
+                if room["phase"] != (
+                    "🌙 НОЧЬ — МАФИЯ"
+                ):
+
+                    continue
+
+
+                player =
+                    room["players"].get(
+                        player_name
+                    )
+
+
+                if (
+                    not player
+                    or
+                    not player["alive"]
+                    or
+                    player["role"]
+                    !=
+                    "Шериф"
+                ):
+
+                    continue
+
+
+                target =
+                    str(
+                        data.get(
+                            "target",
+                            ""
+                        )
+                    ).strip()
+
+
+                target_player =
+                    room["players"].get(
+                        target
+                    )
+
+
+                if (
+                    not target_player
+                    or
+                    not target_player["alive"]
+                ):
+
+                    continue
+
+
+                if is_mafia(
+                    target_player
+                ):
+
+                    result =
+                        "🔴 МАФИЯ"
+
+                elif (
+                    target_player["role"]
+                    ==
+                    "Маньяк"
+                ):
+
+                    result =
+                        "🟡 МАНЬЯК"
+
+                else:
+
+                    result =
+                        "🟢 НЕ МАФИЯ"
+
+
+                await websocket.send_json({
+
+                    "type":
+                        "info",
+
+                    "message":
+                        target +
+                        ": " +
+                        result
+
+                })
+
+
+            # =================================================
+            # DETECTIVE
+            # =================================================
+
+            elif command == "detect":
+
+                if room["phase"] != (
+                    "🌙 НОЧЬ — МАФИЯ"
+                ):
+
+                    continue
+
+
+                player =
+                    room["players"].get(
+                        player_name
+                    )
+
+
+                if (
+                    not player
+                    or
+                    not player["alive"]
+                    or
+                    player["role"]
+                    !=
+                    "Детектив"
+                ):
+
+                    continue
+
+
+                target =
+                    str(
+                        data.get(
+                            "target",
+                            ""
+                        )
+                    ).strip()
+
+
+                target_player =
+                    room["players"].get(
+                        target
+                    )
+
+
+                if (
+                    not target_player
+                    or
+                    not target_player["alive"]
+                ):
+
+                    continue
+
+
+                await websocket.send_json({
+
+                    "type":
+                        "info",
+
+                    "message":
+                        target +
+                        " — роль: " +
+                        target_player[
+                            "role"
+                        ]
+
+                })
+
+
+            # =================================================
+            # VOTE
             # =================================================
 
             elif command == "vote":
 
-                if (
-                    room["phase"] !=
+                if room["phase"] != (
                     "🗳️ ГОЛОСОВАНИЕ"
                 ):
 
                     continue
 
 
-                player = (
-                    room["players"]
-                    .get(player_name)
-                )
-
-
-                target_name = str(
-                    data.get(
-                        "target",
-                        ""
+                player =
+                    room["players"].get(
+                        player_name
                     )
-                ).strip()
 
 
-                if not player:
-
-                    continue
-
-
-                if not player["alive"]:
-
-                    continue
-
-
-                if target_name not in (
-                    room["players"]
+                if (
+                    not player
+                    or
+                    not player["alive"]
                 ):
 
                     continue
 
 
-                target = (
-                    room["players"]
-                    [target_name]
-                )
+                target =
+                    str(
+                        data.get(
+                            "target",
+                            ""
+                        )
+                    ).strip()
 
 
-                if not target["alive"]:
+                if target == player_name:
 
                     continue
 
 
-                if target_name == player_name:
+                if not is_alive(
+                    room,
+                    target
+                ):
 
                     continue
 
 
                 room["votes"][
                     player_name
-                ] = target_name
+                ] = target
 
 
                 room["announcement"] = (
-                    f"{player_name} "
+                    f"🗳️ {player_name} "
                     "проголосовал."
                 )
 
 
-                await broadcast(room)
+                await broadcast(
+                    room
+                )
 
 
     except WebSocketDisconnect:
@@ -2352,57 +4006,67 @@ async def websocket_endpoint(
     finally:
 
         if (
-            room is not None
+            room
             and
-            player_name is not None
+            player_name
         ):
 
-            room["connections"].pop(
+            room[
+                "connections"
+            ].pop(
                 websocket,
                 None
             )
 
 
-            # ------------------------------------------------
-            # Игрок выходит только из лобби
-            # ------------------------------------------------
+            # Игрок удаляется
+            # только из лобби
 
             if (
-                room["phase"] == "ЛОББИ"
+                room["phase"]
+                ==
+                "ЛОББИ"
                 and
-                player_name in room["players"]
+                player_name
+                in
+                room["players"]
             ):
 
-                del room["players"][
+                del room[
+                    "players"
+                ][
                     player_name
                 ]
 
 
-                # Передаём хоста
-
                 if (
-                    room["host"] ==
+                    room["host"]
+                    ==
                     player_name
                 ):
 
                     if room["players"]:
 
-                        room["host"] = next(
-                            iter(
-                                room["players"]
+                        room["host"] =
+                            next(
+                                iter(
+                                    room[
+                                        "players"
+                                    ]
+                                )
                             )
-                        )
 
                     else:
 
-                        room["host"] = None
+                        room["host"] =
+                            None
 
 
             await broadcast(room)
 
 
 # ============================================================
-# ЛОКАЛЬНЫЙ ЗАПУСК
+# RUN
 # ============================================================
 
 if __name__ == "__main__":
