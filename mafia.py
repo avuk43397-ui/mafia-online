@@ -17,7 +17,6 @@ DAY = "☀️ ДЕНЬ"
 VOTE = "🗳️ ГОЛОСОВАНИЕ"
 WIN = "🏆 ИГРА ОКОНЧЕНА"
 
-
 ROLE_INFO = {
     "Мафия": ("🔴", "Ночью выбирает жертву."),
     "Дон": ("👑", "Глава мафии."),
@@ -30,659 +29,715 @@ ROLE_INFO = {
 }
 
 
-HTML = r"""<!doctype html>
+# ============================================================
+# HTML
+# ============================================================
+
+HTML = r"""
+<!DOCTYPE html>
 <html lang="ru">
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="UTF-8">
 
 <meta
     name="viewport"
-    content="width=device-width, initial-scale=1"
+    content="width=device-width, initial-scale=1.0"
 >
 
-<title>Mafia Online</title>
+<title>MAFIA ONLINE</title>
 
 <style>
-
-:root {
-    --accent: #9b5cff;
-    --bg: #080a10;
-    --panel: #10131d;
-    --panel2: #151a27;
-    --text: #f5f7ff;
-    --muted: #8992a7;
-    --danger: #ff4d67;
-    --good: #39d98a;
-    --gold: #f4c95d;
-}
 
 * {
     box-sizing: border-box;
 }
 
 body {
+
     margin: 0;
+
+    min-height: 100vh;
+
     background:
         radial-gradient(
             circle at 20% 0%,
-            #20123a 0,
-            #080a10 42%
-        );
-    color: var(--text);
-    font-family: Inter, system-ui, Arial;
-    min-height: 100vh;
+            rgba(155, 92, 255, .18),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 90% 100%,
+            rgba(255, 60, 90, .12),
+            transparent 35%
+        ),
+        #07070c;
+
+    color: white;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 }
+
+
+/* ============================================================
+   GENERAL
+============================================================ */
 
 button,
 input,
 select {
+
     font: inherit;
 }
 
 button {
+
     cursor: pointer;
-    border: 0;
 }
 
 .hidden {
+
     display: none !important;
 }
 
 
-/* TOP */
+.screen {
 
-.top {
-    height: 68px;
-
-    border-bottom:
-        1px solid #ffffff12;
-
-    background:
-        #080a10cc;
-
-    backdrop-filter:
-        blur(16px);
+    min-height: 100vh;
 
     display: flex;
 
+    justify-content: center;
+
     align-items: center;
 
-    justify-content:
-        space-between;
-
-    padding:
-        0 22px;
-
-    position:
-        sticky;
-
-    top: 0;
-
-    z-index: 5;
+    padding: 20px;
 }
 
+
+.card {
+
+    width: min(560px, 100%);
+
+    background: rgba(17, 17, 26, .94);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, .08);
+
+    border-radius: 28px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 30px 100px
+        rgba(0, 0, 0, .65);
+}
+
+
 .logo {
-    font-size: 21px;
+
+    text-align: center;
+
+    font-size: 52px;
 
     font-weight: 900;
+
+    letter-spacing: 7px;
+
+    margin-bottom: 8px;
+}
+
+
+.subtitle {
+
+    text-align: center;
+
+    color: #888896;
+
+    margin-bottom: 30px;
 
     letter-spacing: 2px;
 }
 
-.logo b {
-    color:
-        var(--accent);
+
+.menu {
+
+    display: grid;
+
+    gap: 12px;
+
+    max-width: 360px;
+
+    margin: auto;
 }
 
-.topright {
+
+.btn {
+
+    border:
+        1px solid
+        rgba(255, 255, 255, .08);
+
+    background: #191923;
+
+    color: white;
+
+    border-radius: 15px;
+
+    padding: 14px 18px;
+
+    min-height: 48px;
+
+    transition: .2s;
+}
+
+
+.btn:hover {
+
+    transform: translateY(-2px);
+
+    background: #252532;
+}
+
+
+.btn:disabled {
+
+    opacity: .4;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+.btn.accent {
+
+    border: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            #854cff,
+            #bd6cff
+        );
+}
+
+
+.btn.danger {
+
+    background: #35151e;
+
+    color: #ff9cab;
+}
+
+
+.input {
+
+    width: 100%;
+
+    margin: 7px 0;
+
+    padding: 14px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, .08);
+
+    border-radius: 14px;
+
+    background: #0c0c12;
+
+    color: white;
+
+    outline: none;
+}
+
+
+.input:focus {
+
+    border-color: #9b5cff;
+}
+
+
+/* ============================================================
+   GAME
+============================================================ */
+
+#gameScreen {
+
+    display: none;
+
+    min-height: 100vh;
+
+    padding: 85px 15px 30px;
+}
+
+
+#gameScreen.active {
+
+    display: block;
+}
+
+
+.topbar {
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    right: 0;
+
+    z-index: 20;
+
     display: flex;
+
+    align-items: center;
 
     gap: 8px;
 
-    align-items: center;
+    padding: 12px;
+
+    background:
+        rgba(7, 7, 12, .88);
+
+    backdrop-filter: blur(15px);
+
+    border-bottom:
+        1px solid
+        rgba(255, 255, 255, .08);
 }
+
+
+.spacer {
+
+    flex: 1;
+}
+
 
 .pill {
-    background:
-        #ffffff0c;
+
+    padding: 8px 12px;
+
+    border-radius: 999px;
+
+    background: #171720;
 
     border:
-        1px solid #ffffff12;
+        1px solid
+        rgba(255, 255, 255, .08);
 
-    padding:
-        8px 12px;
-
-    border-radius:
-        12px;
-
-    color:
-        #cbd2e5;
+    font-size: 13px;
 }
 
 
-/* CONTAINER */
+.game {
 
-.container {
-    max-width:
-        1250px;
+    width: min(1200px, 100%);
 
-    margin:
-        22px auto;
-
-    padding:
-        0 16px;
+    margin: auto;
 }
 
-.grid {
-    display:
-        grid;
+
+.layout {
+
+    display: grid;
 
     grid-template-columns:
-        1.3fr .7fr;
+        1fr
+        330px;
 
-    gap:
-        16px;
+    gap: 15px;
 }
 
-
-/* PANEL */
 
 .panel {
+
     background:
-        linear-gradient(
-            180deg,
-            #111521f2,
-            #0c0f17f2
-        );
+        rgba(17, 17, 26, .94);
 
     border:
-        1px solid #ffffff12;
+        1px solid
+        rgba(255, 255, 255, .08);
 
-    border-radius:
-        20px;
+    border-radius: 22px;
 
-    padding:
-        18px;
-
-    box-shadow:
-        0 20px 60px #0006;
-}
-
-h2 {
-    margin:
-        0 0 14px;
-
-    font-size:
-        17px;
+    padding: 18px;
 }
 
 
-/* ANNOUNCEMENT */
+.phase {
+
+    text-align: center;
+
+    padding: 24px;
+}
+
+
+.phase h2 {
+
+    margin: 0 0 10px;
+
+    font-size: 30px;
+}
+
+
+.timer {
+
+    font-size: 35px;
+
+    font-weight: 900;
+
+    color: #ffc857;
+}
+
 
 .announcement {
-    padding:
-        14px 16px;
 
-    border-radius:
-        15px;
+    color: #d0d0d8;
 
-    background:
-        #ffffff08;
-
-    border:
-        1px solid #ffffff10;
-
-    margin-bottom:
-        16px;
-
-    font-weight:
-        800;
+    min-height: 25px;
 }
 
 
-/* PLAYERS */
-
 .players {
-    display:
-        grid;
+
+    display: grid;
 
     grid-template-columns:
         repeat(
             auto-fill,
-            minmax(
-                220px,
-                1fr
-            )
+            minmax(150px, 1fr)
         );
 
-    gap:
-        10px;
+    gap: 10px;
 }
+
 
 .player {
-    background:
-        var(--panel2);
+
+    position: relative;
+
+    min-height: 115px;
+
+    padding: 12px;
+
+    border-radius: 17px;
+
+    background: #15151f;
 
     border:
-        1px solid #ffffff0d;
-
-    border-radius:
-        16px;
-
-    padding:
-        11px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        10px;
-
-    position:
-        relative;
-
-    transition:
-        .2s;
+        1px solid
+        rgba(255, 255, 255, .08);
 }
 
-.player:hover {
-    transform:
-        translateY(-2px);
 
-    border-color:
-        var(--accent);
+.player.dead {
+
+    opacity: .4;
+
+    filter: grayscale(1);
 }
+
 
 .avatar {
-    width:
-        46px;
 
-    height:
-        46px;
+    width: 50px;
 
-    border-radius:
-        14px;
+    height: 50px;
 
-    object-fit:
-        cover;
+    object-fit: cover;
 
-    background:
-        #272c3b;
+    border-radius: 50%;
 
-    display:
-        grid;
+    background: #292936;
 
-    place-items:
-        center;
+    display: block;
 
-    font-weight:
-        900;
-
-    flex:
-        none;
+    margin-bottom: 8px;
 }
 
-.pname {
-    font-weight:
-        800;
+
+.dot {
+
+    display: inline-block;
+
+    width: 8px;
+
+    height: 8px;
+
+    margin-right: 5px;
+
+    border-radius: 50%;
+
+    background: #42e695;
 }
 
-.sub {
-    font-size:
-        12px;
 
-    color:
-        var(--muted);
+.dead .dot {
 
-    margin-top:
-        3px;
+    background: #777;
 }
 
-.dead {
-    opacity:
-        .45;
 
-    filter:
-        grayscale(1);
+.playername {
+
+    font-weight: 800;
+
+    word-break: break-word;
 }
+
 
 .host {
-    color:
-        var(--gold);
+
+    color: #ffc857;
+
+    font-size: 12px;
+
+    margin-top: 4px;
 }
 
 
-/* BUTTONS */
+.small {
+
+    color: #8f8f9d;
+
+    font-size: 12px;
+}
+
+
+.rolebox {
+
+    margin-top: 18px;
+
+    padding: 16px;
+
+    background: #0c0c12;
+
+    border-radius: 18px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, .08);
+}
+
+
+.rolebig {
+
+    font-size: 23px;
+
+    font-weight: 900;
+
+    margin: 5px 0;
+}
+
 
 .actions {
-    display:
-        flex;
 
-    flex-wrap:
-        wrap;
+    display: grid;
 
-    gap:
-        8px;
+    grid-template-columns:
+        repeat(2, 1fr);
 
-    margin-top:
-        15px;
+    gap: 7px;
 
-    align-items:
-        center;
+    margin-top: 10px;
 }
 
-.btn {
-    background:
-        #ffffff0d;
-
-    color:
-        #fff;
-
-    border:
-        1px solid #ffffff12;
-
-    border-radius:
-        12px;
-
-    padding:
-        10px 13px;
-
-    font-weight:
-        800;
-
-    transition:
-        .15s;
-}
-
-.btn:hover {
-    border-color:
-        var(--accent);
-
-    transform:
-        translateY(-1px);
-}
-
-.accent {
-    background:
-        var(--accent);
-}
-
-.danger {
-    background:
-        #8f2435;
-}
-
-.gold {
-    background:
-        #6e5314;
-}
-
-.good {
-    background:
-        #176b49;
-}
-
-
-/* LOG */
 
 .log {
-    height:
-        430px;
 
-    overflow:
-        auto;
+    max-height: 400px;
 
-    background:
-        #090c13;
+    overflow-y: auto;
 
-    border-radius:
-        14px;
+    display: flex;
 
-    padding:
-        12px;
+    flex-direction: column;
 
-    font-size:
-        13px;
-
-    line-height:
-        1.55;
+    gap: 7px;
 }
+
 
 .log div {
-    padding:
-        4px 0;
 
-    border-bottom:
-        1px solid #ffffff06;
+    padding: 9px;
+
+    border-radius: 10px;
+
+    background: #0c0c12;
+
+    color: #c9c9d4;
+
+    font-size: 13px;
 }
 
 
-/* TIMER */
-
-.timer {
-    font-size:
-        25px;
-
-    font-weight:
-        900;
-
-    color:
-        var(--accent);
-}
-
-
-/* RESULT */
-
-.result {
-    margin-top:
-        14px;
-
-    padding:
-        14px;
-
-    border-radius:
-        14px;
-
-    background:
-        #ffffff08;
-}
-
-
-/* MODAL */
+/* ============================================================
+   MODAL
+============================================================ */
 
 .modal {
-    position:
-        fixed;
 
-    inset:
-        0;
+    position: fixed;
 
-    background:
-        #000a;
+    inset: 0;
 
-    display:
-        grid;
+    z-index: 100;
 
-    place-items:
-        center;
+    display: none;
 
-    z-index:
-        20;
+    align-items: center;
 
-    padding:
-        16px;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, .78);
 }
+
+
+.modal.active {
+
+    display: flex;
+}
+
 
 .modalbox {
-    width:
-        min(
-            560px,
-            100%
-        );
 
-    background:
-        #10131d;
+    width: min(480px, 100%);
 
-    border:
-        1px solid #ffffff18;
+    padding: 24px;
 
-    border-radius:
-        22px;
+    border-radius: 24px;
 
-    padding:
-        22px;
-
-    box-shadow:
-        0 30px 100px #000;
-}
-
-input[type="text"] {
-    width:
-        100%;
-
-    padding:
-        12px;
-
-    border-radius:
-        12px;
+    background: #15151f;
 
     border:
-        1px solid #ffffff15;
-
-    background:
-        #080b12;
-
-    color:
-        #fff;
-
-    outline:
-        0;
-
-    margin:
-        7px 0 12px;
-}
-
-input[type="file"] {
-    width:
-        100%;
-
-    margin:
-        8px 0 15px;
-
-    color:
-        #bbc2d4;
-}
-
-select {
-    padding:
-        10px;
-
-    border-radius:
-        12px;
-
-    background:
-        #090c13;
-
-    color:
-        white;
-
-    border:
-        1px solid #ffffff15;
-}
-
-.colors {
-    display:
-        flex;
-
-    gap:
-        9px;
-
-    margin:
-        8px 0 16px;
-
-    flex-wrap:
-        wrap;
-}
-
-.sw {
-    width:
-        30px;
-
-    height:
-        30px;
-
-    border-radius:
-        50%;
-
-    border:
-        2px solid transparent;
-}
-
-.sw.active {
-    border-color:
-        #fff;
+        1px solid
+        rgba(255, 255, 255, .08);
 }
 
 
-/* TOAST */
+.avatar-preview {
+
+    width: 90px;
+
+    height: 90px;
+
+    object-fit: cover;
+
+    display: block;
+
+    margin: 15px auto;
+
+    border-radius: 50%;
+
+    background: #292936;
+}
+
+
+.row {
+
+    display: flex;
+
+    gap: 8px;
+}
+
+
+.row > * {
+
+    flex: 1;
+}
+
+
+/* ============================================================
+   TOAST
+============================================================ */
 
 .toast {
-    position:
-        fixed;
 
-    right:
-        18px;
+    position: fixed;
 
-    bottom:
-        18px;
+    left: 50%;
 
-    z-index:
-        30;
+    bottom: 20px;
 
-    background:
-        #161b28;
+    transform: translateX(-50%);
+
+    z-index: 200;
+
+    display: none;
+
+    padding: 13px 20px;
+
+    border-radius: 14px;
+
+    background: #222230;
 
     border:
-        1px solid #ffffff18;
-
-    border-radius:
-        14px;
-
-    padding:
-        13px 16px;
-
-    box-shadow:
-        0 15px 40px #0008;
+        1px solid
+        rgba(255, 255, 255, .1);
 }
 
 
-/* MOBILE */
+.toast.show {
 
-@media(max-width:850px) {
+    display: block;
+}
 
-    .grid {
-        grid-template-columns:
-            1fr;
+
+.kick {
+
+    position: absolute;
+
+    right: 7px;
+
+    top: 7px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    padding: 4px 7px;
+
+    background: #451b26;
+
+    color: #ff9aaa;
+}
+
+
+@media (max-width: 800px) {
+
+    .layout {
+
+        grid-template-columns: 1fr;
     }
 
-    .log {
-        height:
-            250px;
+}
+
+
+@media (max-width: 450px) {
+
+    .logo {
+
+        font-size: 38px;
     }
 
     .players {
+
         grid-template-columns:
-            1fr;
+            repeat(2, 1fr);
     }
 
-    .topright .pill {
-        display:
-            none;
+    .actions {
+
+        grid-template-columns: 1fr;
     }
 
 }
@@ -695,346 +750,525 @@ select {
 <body>
 
 
-<header class="top">
-
-<div class="logo">
-    MAFIA <b>ONLINE</b>
-</div>
-
-
-<div class="topright">
-
-<span
-    id="roomPill"
-    class="pill"
->
-    Комната —
-</span>
-
-
-<span
-    id="phasePill"
-    class="pill"
->
-    ЛОББИ
-</span>
-
-
-<button
-    class="btn"
-    onclick="openProfile()"
->
-    👤 Профиль
-</button>
-
-
-<button
-    class="btn"
-    onclick="openTheme()"
->
-    🎨
-</button>
-
-</div>
-
-</header>
-
-
-<div class="container">
-
+<!-- ============================================================
+     HOME
+============================================================ -->
 
 <div
-    id="announcement"
-    class="announcement"
+    id="homeScreen"
+    class="screen"
 >
-    Подключение...
+
+    <div class="card">
+
+        <div class="logo">
+            MAFIA
+        </div>
+
+        <div class="subtitle">
+            ONLINE • NIGHT • LIES • SURVIVAL
+        </div>
+
+        <div class="menu">
+
+            <button
+                class="btn accent"
+                onclick="openPlay()"
+            >
+                🎮 Играть
+            </button>
+
+            <button
+                class="btn"
+                onclick="openSettings()"
+            >
+                ⚙️ Настройки
+            </button>
+
+            <button
+                class="btn"
+                onclick="openProfile()"
+            >
+                👤 Профиль
+            </button>
+
+        </div>
+
+    </div>
+
 </div>
 
 
-<div class="grid">
-
-
-<section class="panel">
-
-<h2>
-
-👥 Игроки
-
-<span
-    id="timer"
-    class="timer"
-    style="float:right"
->
-</span>
-
-</h2>
-
+<!-- ============================================================
+     PLAY
+============================================================ -->
 
 <div
-    id="players"
-    class="players"
+    id="playScreen"
+    class="screen hidden"
 >
+
+    <div class="card">
+
+        <h2>
+            🎮 Играть
+        </h2>
+
+        <button
+            class="btn accent"
+            style="width:100%"
+            onclick="createRoom()"
+        >
+            ➕ Создать игру
+        </button>
+
+        <div
+            style="
+                text-align:center;
+                color:#888;
+                margin:15px
+            "
+        >
+            или
+        </div>
+
+        <input
+            id="roomInput"
+            class="input"
+            maxlength="4"
+            placeholder="Код комнаты"
+        >
+
+        <button
+            class="btn"
+            style="width:100%"
+            onclick="joinRoom()"
+        >
+            🔑 Ввести код
+        </button>
+
+        <button
+            class="btn"
+            style="
+                width:100%;
+                margin-top:10px
+            "
+            onclick="showHome()"
+        >
+            ← Назад
+        </button>
+
+    </div>
+
 </div>
 
+
+<!-- ============================================================
+     GAME
+============================================================ -->
 
 <div
-    id="hostControls"
-    class="actions hidden"
+    id="gameScreen"
 >
+
+    <div class="topbar">
+
+        <span
+            id="roomPill"
+            class="pill"
+        >
+            Комната
+        </span>
+
+        <span
+            id="phasePill"
+            class="pill"
+        >
+            ЛОББИ
+        </span>
+
+        <span
+            id="timer"
+            class="pill"
+        >
+            —
+        </span>
+
+        <div class="spacer"></div>
+
+        <button
+            class="btn"
+            onclick="openProfile()"
+        >
+            👤
+        </button>
+
+        <button
+            class="btn"
+            onclick="leaveGame()"
+        >
+            🚪
+        </button>
+
+    </div>
+
+
+    <div class="game">
+
+        <div class="layout">
+
+            <main>
+
+                <div
+                    class="panel phase"
+                >
+
+                    <h2 id="phaseTitle">
+                        ЛОББИ
+                    </h2>
+
+                    <div
+                        id="announcement"
+                        class="announcement"
+                    >
+                        Ожидание игроков...
+                    </div>
+
+                    <div
+                        id="roleBox"
+                        class="rolebox hidden"
+                    >
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="panel"
+                    style="margin-top:15px"
+                >
+
+                    <h3>
+                        👥 Игроки
+                        <span
+                            id="playerCount"
+                            class="small"
+                        >
+                        </span>
+                    </h3>
+
+                    <div
+                        id="players"
+                        class="players"
+                    >
+                    </div>
+
+                </div>
+
+            </main>
+
+
+            <aside>
+
+                <div class="panel">
+
+                    <h3>
+                        📜 События
+                    </h3>
+
+                    <div
+                        id="log"
+                        class="log"
+                    >
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </div>
+
 </div>
 
 
-<div
-    id="actions"
-    class="actions"
->
-</div>
-
-
-<div
-    id="result"
-    class="result hidden"
->
-</div>
-
-</section>
-
-
-<section class="panel">
-
-<h2>
-    📜 События
-</h2>
-
-<div
-    id="log"
-    class="log"
->
-</div>
-
-</section>
-
-
-</div>
-
-</div>
-
-
-<!-- PROFILE -->
-
+<!-- ============================================================
+     PROFILE
+============================================================ -->
 
 <div
     id="profileModal"
-    class="modal hidden"
+    class="modal"
 >
 
-<div class="modalbox">
+    <div class="modalbox">
 
-<h2>
-    👤 Профиль
-</h2>
+        <h2>
+            👤 Профиль
+        </h2>
+
+        <img
+            id="avatarPreview"
+            class="avatar-preview"
+            alt=""
+        >
+
+        <input
+            id="profileName"
+            class="input"
+            maxlength="18"
+            placeholder="Твоё имя"
+        >
+
+        <input
+            id="avatarFile"
+            class="input"
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+        >
+
+        <label class="small">
+            Цвет профиля
+        </label>
+
+        <input
+            id="profileColor"
+            class="input"
+            type="color"
+            value="#9b5cff"
+        >
+
+        <div class="row">
+
+            <button
+                class="btn accent"
+                onclick="saveProfile()"
+            >
+                Сохранить
+            </button>
+
+            <button
+                class="btn"
+                onclick="closeModals()"
+            >
+                Закрыть
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 
-<label>
-    Имя
-</label>
-
-
-<input
-    id="profileName"
-    type="text"
-    maxlength="18"
->
-
-
-<label>
-    Аватарка
-</label>
-
-
-<input
-    id="avatarFile"
-    type="file"
-    accept="image/png,image/jpeg,image/webp,image/gif"
->
-
-
-<label>
-    Цвет профиля
-</label>
-
+<!-- ============================================================
+     SETTINGS
+============================================================ -->
 
 <div
-    class="colors"
-    id="colors"
->
-</div>
-
-
-<div class="actions">
-
-<button
-    class="btn accent"
-    onclick="saveProfile()"
->
-    Сохранить
-</button>
-
-
-<button
-    class="btn"
-    onclick="closeModals()"
->
-    Закрыть
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- THEME -->
-
-
-<div
-    id="themeModal"
-    class="modal hidden"
+    id="settingsModal"
+    class="modal"
 >
 
-<div class="modalbox">
+    <div class="modalbox">
 
-<h2>
-    🎨 Цвет интерфейса
-</h2>
+        <h2>
+            ⚙️ Настройки
+        </h2>
 
+        <button
+            id="soundButton"
+            class="btn"
+            style="width:100%"
+            onclick="toggleSound()"
+        >
+            🔊 Звуки: ВКЛ
+        </button>
 
-<div
-    class="colors"
-    id="themeColors"
->
-</div>
+        <button
+            class="btn"
+            style="
+                width:100%;
+                margin-top:10px
+            "
+            onclick="closeModals()"
+        >
+            Готово
+        </button>
 
-
-<div class="actions">
-
-<button
-    class="btn"
-    onclick="closeModals()"
->
-    Готово
-</button>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 
 
 <div
     id="toast"
-    class="toast hidden"
+    class="toast"
 >
 </div>
 
 
 <script>
 
-
 let ws = null;
-
-let me = "";
-
-let room = "";
 
 let state = null;
 
-let avatar = "";
+let currentRoom = "";
 
-let profileColor = "#9b5cff";
+let soundEnabled =
+    localStorage.getItem(
+        "mafiaSound"
+    ) !== "off";
 
 
-const accents = [
-    "#9b5cff",
-    "#ff4d67",
-    "#39d98a",
-    "#38a8ff",
-    "#f4c95d",
-    "#ff7a45",
-    "#e85dff"
-];
+let profile = {
 
+    name:
+        localStorage.getItem(
+            "mafiaName"
+        ) || "Игрок",
+
+    avatar:
+        localStorage.getItem(
+            "mafiaAvatar"
+        ) || "",
+
+    color:
+        localStorage.getItem(
+            "mafiaColor"
+        ) || "#9b5cff"
+
+};
+
+
+const ROLE_INFO = {
+
+    "Мафия":
+        ["🔴", "Ночью выбирает жертву."],
+
+    "Дон":
+        ["👑", "Глава мафии."],
+
+    "Доктор":
+        ["🩺", "Ночью спасает игрока."],
+
+    "Шериф":
+        ["🔎", "Один раз за игру проверяет игрока."],
+
+    "Телохранитель":
+        ["🛡️", "Ночью защищает игрока."],
+
+    "Маньяк":
+        ["🔪", "Ночью убивает игроков."],
+
+    "Детектив":
+        ["🕵️", "Ночью узнаёт точную роль."],
+
+    "Мирный":
+        ["🟢", "Голосует днём."]
+
+};
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
 
 function $(id) {
+
     return document.getElementById(id);
+
 }
 
 
-function toast(text) {
+function toast(message) {
 
-    $("toast").textContent = text;
+    const element =
+        $("toast");
 
-    $("toast").classList.remove("hidden");
+    element.textContent =
+        message;
+
+    element.classList.add(
+        "show"
+    );
 
     setTimeout(
-        () => $("toast").classList.add("hidden"),
-        3000
+        () => {
+            element.classList.remove(
+                "show"
+            );
+        },
+        2500
     );
+
 }
 
 
-function send(data) {
+function escapeHTML(value) {
 
-    if (
-        ws &&
-        ws.readyState === 1
-    ) {
-        ws.send(
-            JSON.stringify(data)
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function showHome() {
+
+    $("homeScreen")
+        .classList.remove(
+            "hidden"
         );
-    }
+
+    $("homeScreen")
+        .style.display = "flex";
+
+    $("playScreen")
+        .classList.add(
+            "hidden"
+        );
+
+    $("playScreen")
+        .style.display = "none";
+
+    $("gameScreen")
+        .classList.remove(
+            "active"
+        );
 
 }
 
 
-function esc(value) {
+function openPlay() {
 
-    return String(value).replace(
-        /[&<>"']/g,
-        function(c) {
+    $("homeScreen")
+        .style.display = "none";
 
-            return {
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;"
-            }[c];
+    $("playScreen")
+        .classList.remove(
+            "hidden"
+        );
 
-        }
-    );
+    $("playScreen")
+        .style.display = "flex";
 
 }
 
 
-function openProfile() {
+function openSettings() {
 
-    $("profileName").value = me;
+    $("settingsModal")
+        .classList.add(
+            "active"
+        );
 
-    $("profileModal")
-        .classList
-        .remove("hidden");
-
-}
-
-
-function openTheme() {
-
-    $("themeModal")
-        .classList
-        .remove("hidden");
+    updateSoundButton();
 
 }
 
@@ -1044,182 +1278,307 @@ function closeModals() {
     document
         .querySelectorAll(".modal")
         .forEach(
-            x => x.classList.add("hidden")
+            element =>
+                element.classList.remove(
+                    "active"
+                )
         );
 
 }
 
 
-function makeColors(
-    id,
-    callback
-) {
+/* ============================================================
+   PROFILE
+============================================================ */
 
-    $(id).innerHTML =
-        accents
-        .map(
-            c =>
-                `<button
-                    class="sw ${c === profileColor ? "active" : ""}"
-                    style="background:${c}"
-                    onclick="${callback}('${c}')"
-                ></button>`
-        )
-        .join("");
+function openProfile() {
 
-}
+    $("profileName").value =
+        profile.name;
 
+    $("profileColor").value =
+        profile.color;
 
-function chooseColor(c) {
+    $("avatarPreview").src =
+        profile.avatar || "";
 
-    profileColor = c;
-
-    document
-        .documentElement
-        .style
-        .setProperty(
-            "--accent",
-            c
+    $("profileModal")
+        .classList.add(
+            "active"
         );
 
-    makeColors(
-        "colors",
-        "chooseColor"
-    );
-
 }
 
 
-function chooseTheme(c) {
+$("avatarFile")
+    .addEventListener(
+        "change",
+        function(event) {
 
-    document
-        .documentElement
-        .style
-        .setProperty(
-            "--accent",
-            c
-        );
+            const file =
+                event.target.files[0];
 
-    localStorage.setItem(
-        "accent",
-        c
+            if (!file) {
+                return;
+            }
+
+            if (
+                file.size >
+                400000
+            ) {
+
+                toast(
+                    "Аватар слишком большой. Максимум 400 КБ."
+                );
+
+                return;
+
+            }
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
+                function() {
+
+                    profile.avatar =
+                        reader.result;
+
+                    $("avatarPreview")
+                        .src =
+                        reader.result;
+
+                };
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
     );
-
-    makeColors(
-        "themeColors",
-        "chooseTheme"
-    );
-
-}
 
 
 function saveProfile() {
 
-    const file =
-        $("avatarFile").files[0];
-
-    const name =
-        $("profileName")
-        .value
-        .trim();
-
-
-    if (!name) {
-
-        toast("Введите имя");
-
-        return;
-
-    }
-
-
-    me = name;
-
-
-    if (file) {
-
-        const reader =
-            new FileReader();
-
-
-        reader.onload =
-            function() {
-
-                avatar =
-                    reader.result;
-
-                localStorage.setItem(
-                    "mafia_profile",
-                    JSON.stringify({
-                        name: me,
-                        avatar: avatar,
-                        color: profileColor
-                    })
-                );
-
-
-                send({
-                    type: "profile",
-                    name: me,
-                    avatar: avatar,
-                    color: profileColor
-                });
-
-            };
-
-
-        reader.readAsDataURL(file);
-
-    } else {
-
-        localStorage.setItem(
-            "mafia_profile",
-            JSON.stringify({
-                name: me,
-                avatar: avatar,
-                color: profileColor
-            })
+    profile.name =
+        (
+            $("profileName")
+                .value
+                .trim()
+            ||
+            "Игрок"
+        ).slice(
+            0,
+            18
         );
 
 
-        send({
-            type: "profile",
-            name: me,
-            avatar: avatar,
-            color: profileColor
-        });
+    profile.color =
+        $("profileColor")
+            .value;
+
+
+    localStorage.setItem(
+        "mafiaName",
+        profile.name
+    );
+
+    localStorage.setItem(
+        "mafiaAvatar",
+        profile.avatar
+    );
+
+    localStorage.setItem(
+        "mafiaColor",
+        profile.color
+    );
+
+
+    if (
+        ws &&
+        ws.readyState === 1
+    ) {
+
+        ws.send(
+            JSON.stringify({
+
+                type:
+                    "profile",
+
+                name:
+                    profile.name,
+
+                avatar:
+                    profile.avatar,
+
+                color:
+                    profile.color
+
+            })
+        );
 
     }
 
 
     closeModals();
 
+    toast(
+        "Профиль сохранён"
+    );
+
 }
 
 
-function connect() {
+/* ============================================================
+   SOUND
+============================================================ */
 
-    const proto =
-        location.protocol === "https:"
-            ? "wss"
-            : "ws";
+function updateSoundButton() {
+
+    $("soundButton")
+        .textContent =
+        soundEnabled
+        ? "🔊 Звуки: ВКЛ"
+        : "🔇 Звуки: ВЫКЛ";
+
+}
 
 
-    ws = new WebSocket(
-        `${proto}://${location.host}/ws`
+function toggleSound() {
+
+    soundEnabled =
+        !soundEnabled;
+
+    localStorage.setItem(
+        "mafiaSound",
+        soundEnabled
+            ? "on"
+            : "off"
     );
+
+    updateSoundButton();
+
+}
+
+
+/* ============================================================
+   CREATE / JOIN
+============================================================ */
+
+async function createRoom() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/create"
+            );
+
+        const data =
+            await response.json();
+
+        connect(
+            data.room
+        );
+
+    }
+    catch {
+
+        toast(
+            "Не удалось создать комнату"
+        );
+
+    }
+
+}
+
+
+function joinRoom() {
+
+    const code =
+        $("roomInput")
+            .value
+            .trim()
+            .toUpperCase();
+
+
+    if (
+        !/^\d{4}$/.test(
+            code
+        )
+    ) {
+
+        toast(
+            "Код должен состоять из 4 цифр"
+        );
+
+        return;
+
+    }
+
+
+    connect(code);
+
+}
+
+
+/* ============================================================
+   WEBSOCKET
+============================================================ */
+
+function connect(code) {
+
+    currentRoom =
+        code;
+
+
+    if (ws) {
+
+        try {
+            ws.close();
+        }
+        catch {}
+
+    }
+
+
+    const protocol =
+        location.protocol === "https:"
+        ? "wss://"
+        : "ws://";
+
+
+    ws =
+        new WebSocket(
+            protocol +
+            location.host +
+            "/ws"
+        );
 
 
     ws.onopen =
         function() {
 
-            send({
-                type: "join",
-                name: me,
-                room: room,
-                avatar: avatar,
-                color: profileColor
-            });
+            ws.send(
+                JSON.stringify({
+
+                    type:
+                        "join",
+
+                    room:
+                        code,
+
+                    name:
+                        profile.name,
+
+                    avatar:
+                        profile.avatar,
+
+                    color:
+                        profile.color
+
+                })
+            );
 
         };
 
@@ -1228,22 +1587,15 @@ function connect() {
         function(event) {
 
             const data =
-                JSON.parse(event.data);
-
-
-            if (data.type === "error") {
-
-                toast(
-                    "❌ " +
-                    data.message
+                JSON.parse(
+                    event.data
                 );
 
-                return;
 
-            }
-
-
-            if (data.type === "info") {
+            if (
+                data.type ===
+                "error"
+            ) {
 
                 toast(
                     data.message
@@ -1254,11 +1606,29 @@ function connect() {
             }
 
 
-            if (data.type === "state") {
+            if (
+                data.type ===
+                "info"
+            ) {
 
-                state = data;
+                toast(
+                    data.message
+                );
 
-                render();
+                return;
+
+            }
+
+
+            if (
+                data.type ===
+                "state"
+            ) {
+
+                state =
+                    data;
+
+                renderGame();
 
             }
 
@@ -1268,8 +1638,28 @@ function connect() {
     ws.onclose =
         function() {
 
+            if (
+                $("gameScreen")
+                    .classList
+                    .contains(
+                        "active"
+                    )
+            ) {
+
+                toast(
+                    "Соединение с игрой закрыто"
+                );
+
+            }
+
+        };
+
+
+    ws.onerror =
+        function() {
+
             toast(
-                "🔴 Соединение закрыто."
+                "Ошибка подключения"
             );
 
         };
@@ -1277,7 +1667,57 @@ function connect() {
 }
 
 
-function render() {
+/* ============================================================
+   SEND
+============================================================ */
+
+function send(
+    type,
+    target = ""
+) {
+
+    if (
+        !ws ||
+        ws.readyState !== 1
+    ) {
+
+        return;
+
+    }
+
+
+    ws.send(
+        JSON.stringify({
+
+            type:
+                type,
+
+            target:
+                target
+
+        })
+    );
+
+}
+
+
+/* ============================================================
+   GAME RENDER
+============================================================ */
+
+function renderGame() {
+
+    $("homeScreen")
+        .style.display = "none";
+
+    $("playScreen")
+        .style.display = "none";
+
+    $("gameScreen")
+        .classList.add(
+            "active"
+        );
+
 
     $("roomPill")
         .textContent =
@@ -1290,655 +1730,682 @@ function render() {
         state.phase;
 
 
-    $("announcement")
+    $("phaseTitle")
         .textContent =
-        state.announcement;
+        state.phase;
 
 
     $("timer")
         .textContent =
-        state.time
-            ? `00:${String(state.time).padStart(2, "0")}`
-            : "";
+        state.time > 0
+        ? "⏱ " +
+          state.time +
+          "с"
+        : "—";
 
 
-    $("log").innerHTML =
-        state.log
-        .map(
-            x =>
-                `<div>${esc(x)}</div>`
-        )
-        .join("");
+    $("announcement")
+        .textContent =
+        state.announcement ||
+        "";
 
 
-    $("players").innerHTML =
-        state.players
-        .map(
-            function(p) {
+    renderRole();
 
-                const avatarHTML =
-                    p.avatar
-                        ?
-                        `<img
-                            class="avatar"
-                            src="${esc(p.avatar)}"
-                        >`
-                        :
-                        `<div
-                            class="avatar"
-                            style="background:${esc(p.color || "#272c3b")}"
-                        >
-                            ${esc(
-                                p.name[0] || "?"
-                            )}
-                        </div>`;
+    renderPlayers();
 
-
-                const host =
-                    p.name === state.host
-                        ?
-                        ` <span class="host">👑</span>`
-                        :
-                        "";
-
-
-                const dead =
-                    p.alive
-                        ? ""
-                        : " dead";
-
-
-                const admin =
-                    me === state.host &&
-                    p.name !== me &&
-                    state.phase === "ЛОББИ";
-
-
-                const adminButton =
-                    admin
-                        ?
-                        `<button
-                            class="btn danger"
-                            onclick="kick('${esc(p.name)}')"
-                        >
-                            Кик
-                        </button>`
-                        :
-                        "";
-
-
-                return `
-                    <div class="player${dead}">
-
-                        ${avatarHTML}
-
-                        <div style="flex:1">
-
-                            <div class="pname">
-
-                                ${esc(p.name)}
-
-                                ${host}
-
-                            </div>
-
-                            <div class="sub">
-
-                                ${
-                                    p.alive
-                                    ?
-                                    "🟢 В игре"
-                                    :
-                                    "💀 Мёртв"
-                                }
-
-                                ${
-                                    p.role &&
-                                    state.phase === "🏆 ИГРА ОКОНЧЕНА"
-                                    ?
-                                    " • " +
-                                    esc(p.role)
-                                    :
-                                    ""
-                                }
-
-                            </div>
-
-                        </div>
-
-                        ${adminButton}
-
-                    </div>
-                `;
-
-            }
-        )
-        .join("");
-
-
-    $("hostControls")
-        .innerHTML = "";
-
-
-    if (
-        me === state.host &&
-        state.phase === "ЛОББИ"
-    ) {
-
-        $("hostControls")
-            .innerHTML =
-                `
-                <button
-                    class="btn gold"
-                    onclick="start()"
-                >
-                    ▶ Начать игру
-                </button>
-                `;
-
-    }
-
-
-    if (
-        me === state.host &&
-        state.phase !== "ЛОББИ" &&
-        state.phase !== "🏆 ИГРА ОКОНЧЕНА"
-    ) {
-
-        $("hostControls")
-            .innerHTML =
-                state.players
-                .filter(
-                    p =>
-                        p.name !== me &&
-                        p.alive
-                )
-                .map(
-                    p =>
-                        `
-                        <button
-                            class="btn"
-                            onclick="transfer('${esc(p.name)}')"
-                        >
-                            👑 Передать хоста:
-                            ${esc(p.name)}
-                        </button>
-                        `
-                )
-                .join("");
-
-    }
-
-
-    renderActions();
-
-
-    if (
-        state.phase === "🏆 ИГРА ОКОНЧЕНА"
-    ) {
-
-        $("result")
-            .classList
-            .remove("hidden");
-
-
-        $("result")
-            .innerHTML =
-                "<b>🏆 Роли игроков</b><br>" +
-
-                (state.roles || [])
-                .map(
-                    r =>
-                        `${esc(r.name)}
-                        —
-                        ${esc(r.role)}
-                        ${r.alive ? "🟢" : "💀"}`
-                )
-                .join("<br>");
-
-    } else {
-
-        $("result")
-            .classList
-            .add("hidden");
-
-    }
+    renderLog();
 
 }
 
 
-function renderActions() {
+function renderRole() {
 
     const box =
-        $("actions");
-
-    box.innerHTML = "";
+        $("roleBox");
 
 
-    if (!state.alive) {
+    if (!state.role) {
+
+        box.classList.add(
+            "hidden"
+        );
 
         return;
 
     }
 
 
-    const candidates =
-        state.players
-        .filter(
-            p =>
-                p.alive &&
-                p.name !== me
-        );
-
-
-    if (!candidates.length) {
-
-        return;
-
-    }
-
-
-    const select =
-        `
-        <select id="target">
-
-            ${
-                candidates
-                .map(
-                    p =>
-                        `<option value="${esc(p.name)}">
-                            ${esc(p.name)}
-                        </option>`
-                )
-                .join("")
-            }
-
-        </select>
-        `;
-
-
-    if (state.phase === "🌙 НОЧЬ") {
-
-        if (
-            ["Мафия", "Дон"]
-            .includes(state.role)
-        ) {
-
-            box.innerHTML +=
-                select +
-
-                `
-                <button
-                    class="btn danger"
-                    onclick="act('kill')"
-                >
-                    🔪 Убить
-                </button>
-                `;
-
-        }
-
-
-        if (
-            state.role === "Маньяк"
-        ) {
-
-            box.innerHTML +=
-                select +
-
-                `
-                <button
-                    class="btn danger"
-                    onclick="act('maniac_kill')"
-                >
-                    🔪 Убить
-                </button>
-                `;
-
-        }
-
-
-        if (
-            state.role === "Доктор"
-        ) {
-
-            box.innerHTML +=
-                select +
-
-                `
-                <button
-                    class="btn good"
-                    onclick="act('heal')"
-                >
-                    🩺 Спасти
-                </button>
-                `;
-
-        }
-
-
-        if (
-            state.role === "Телохранитель"
-        ) {
-
-            box.innerHTML +=
-                select +
-
-                `
-                <button
-                    class="btn"
-                    onclick="act('protect')"
-                >
-                    🛡️ Защитить
-                </button>
-                `;
-
-        }
-
-
-        if (
-            state.role === "Шериф"
-        ) {
-
-            if (
-                state.sheriff_used
-            ) {
-
-                box.innerHTML +=
-                    `
-                    <span class="pill">
-                        🔎 Проверка уже использована
-                    </span>
-                    `;
-
-            } else {
-
-                box.innerHTML +=
-                    select +
-
-                    `
-                    <button
-                        class="btn accent"
-                        onclick="act('inspect')"
-                    >
-                        🔎 Проверить
-                    </button>
-                    `;
-
-            }
-
-        }
-
-
-        if (
-            state.role === "Детектив"
-        ) {
-
-            box.innerHTML +=
-                select +
-
-                `
-                <button
-                    class="btn accent"
-                    onclick="act('detect')"
-                >
-                    🕵️ Узнать роль
-                </button>
-                `;
-
-        }
-
-    }
-
-
-    if (
-        state.phase === "🗳️ ГОЛОСОВАНИЕ"
-    ) {
-
-        box.innerHTML =
-            select +
-
-            `
-            <button
-                class="btn accent"
-                onclick="act('vote')"
-            >
-                🗳️ Голосовать
-            </button>
-            `;
-
-    }
-
-}
-
-
-function act(type) {
-
-    const target =
-        $("target")?.value;
-
-
-    if (target) {
-
-        send({
-            type: type,
-            target: target
-        });
-
-    }
-
-}
-
-
-function start() {
-
-    send({
-        type: "start"
-    });
-
-}
-
-
-function kick(name) {
-
-    if (
-        confirm(
-            "Кикнуть " +
-            name +
-            "?"
-        )
-    ) {
-
-        send({
-            type: "kick",
-            target: name
-        });
-
-    }
-
-}
-
-
-function transfer(name) {
-
-    if (
-        confirm(
-            "Передать хоста игроку " +
-            name +
-            "?"
-        )
-    ) {
-
-        send({
-            type: "transfer_host",
-            target: name
-        });
-
-    }
-
-}
-
-
-const savedAccent =
-    localStorage.getItem("accent");
-
-
-if (savedAccent) {
-
-    document
-        .documentElement
-        .style
-        .setProperty(
-            "--accent",
-            savedAccent
-        );
-
-}
-
-
-makeColors(
-    "colors",
-    "chooseColor"
-);
-
-
-makeColors(
-    "themeColors",
-    "chooseTheme"
-);
-
-
-/* INIT */
-
-(function init() {
-
-    const saved =
-        JSON.parse(
-            localStorage.getItem(
-                "mafia_profile"
-            ) || "{}"
-        );
-
-
-    me =
-        saved.name || "";
-
-    avatar =
-        saved.avatar || "";
-
-    profileColor =
-        saved.color || "#9b5cff";
-
-
-    const params =
-        new URLSearchParams(
-            location.search
-        );
-
-
-    room =
-        (
-            params.get("room") || ""
-        ).toUpperCase();
-
-
-    if (
-        !me ||
-        !room
-    ) {
-
-        document.body.innerHTML =
-            `
-            <div class="modal">
-
-                <div class="modalbox">
-
-                    <h2>
-                        🎭 Mafia Online
-                    </h2>
-
-                    <p>
-                        Введи имя и код комнаты.
-                    </p>
-
-                    <input
-                        id="quickName"
-                        placeholder="Твоё имя"
-                        maxlength="18"
-                    >
-
-                    <input
-                        id="quickRoom"
-                        placeholder="Код комнаты"
-                        maxlength="4"
-                    >
-
-                    <div class="actions">
-
-                        <button
-                            class="btn accent"
-                            onclick="quickJoin()"
-                        >
-                            Войти
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-            `;
-
-    } else {
-
-        connect();
-
-    }
-
-})();
-
-
-function quickJoin() {
-
-    me =
-        $("quickName")
-        .value
-        .trim();
-
-
-    room =
-        $("quickRoom")
-        .value
-        .trim()
-        .toUpperCase();
-
-
-    if (
-        !me ||
-        !room
-    ) {
-
-        return;
-
-    }
-
-
-    localStorage.setItem(
-        "mafia_profile",
-        JSON.stringify({
-            name: me,
-            avatar: avatar,
-            color: profileColor
-        })
+    const info =
+        ROLE_INFO[
+            state.role
+        ] ||
+        ["🎭", ""];
+
+
+    box.classList.remove(
+        "hidden"
     );
 
 
-    location.search =
-        "?room=" +
-        encodeURIComponent(room);
+    box.innerHTML =
+
+        "<div class='small'>ТВОЯ РОЛЬ</div>" +
+
+        "<div class='rolebig'>" +
+
+        info[0] +
+
+        " " +
+
+        escapeHTML(
+            state.role
+        ) +
+
+        "</div>" +
+
+        "<div class='small'>" +
+
+        info[1] +
+
+        "</div>";
 
 }
 
+
+/* ============================================================
+   PLAYERS
+============================================================ */
+
+function renderPlayers() {
+
+    const container =
+        $("players");
+
+
+    container.innerHTML =
+        "";
+
+
+    $("playerCount")
+        .textContent =
+        "(" +
+        state.players.length +
+        "/12)";
+
+
+    state.players.forEach(
+        function(player) {
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+
+            element.className =
+                "player" +
+                (
+                    player.alive
+                    ? ""
+                    : " dead"
+                );
+
+
+            element.style.borderColor =
+                player.color ||
+                "#9b5cff";
+
+
+            let html = "";
+
+
+            html +=
+
+                "<img " +
+
+                "class='avatar' " +
+
+                "src='" +
+
+                (
+                    player.avatar ||
+                    ""
+                ) +
+
+                "'>";
+
+
+            html +=
+
+                "<div>" +
+
+                "<span class='dot'></span>" +
+
+                "<span class='playername'>" +
+
+                escapeHTML(
+                    player.name
+                ) +
+
+                "</span>" +
+
+                "</div>";
+
+
+            if (
+                player.name ===
+                state.host
+            ) {
+
+                html +=
+
+                    "<div class='host'>" +
+
+                    "👑 ХОСТ" +
+
+                    "</div>";
+
+            }
+
+
+            if (
+                !player.alive
+            ) {
+
+                html +=
+
+                    "<div class='small'>" +
+
+                    "💀 ВЫБЫЛ" +
+
+                    "</div>";
+
+            }
+
+
+            /*
+             * ACTIONS
+             */
+
+            let actions =
+                "";
+
+
+            if (
+                state.alive &&
+                player.alive &&
+                player.name !== profile.name
+            ) {
+
+
+                /*
+                 * NIGHT
+                 */
+
+                if (
+                    state.phase ===
+                    NIGHT
+                ) {
+
+
+                    if (
+                        state.role ===
+                            "Мафия" ||
+                        state.role ===
+                            "Дон"
+                    ) {
+
+                        actions +=
+
+                            actionButton(
+                                "🔪 Убить",
+                                "kill",
+                                player.name
+                            );
+
+                    }
+
+
+                    if (
+                        state.role ===
+                        "Маньяк"
+                    ) {
+
+                        actions +=
+
+                            actionButton(
+                                "🔪 Убить",
+                                "maniac_kill",
+                                player.name
+                            );
+
+                    }
+
+
+                    if (
+                        state.role ===
+                        "Доктор"
+                    ) {
+
+                        actions +=
+
+                            actionButton(
+                                "🩺 Лечить",
+                                "heal",
+                                player.name
+                            );
+
+                    }
+
+
+                    if (
+                        state.role ===
+                        "Телохранитель"
+                    ) {
+
+                        actions +=
+
+                            actionButton(
+                                "🛡️ Защитить",
+                                "protect",
+                                player.name
+                            );
+
+                    }
+
+
+                    if (
+                        state.role ===
+                            "Шериф" &&
+                        !state.sheriff_used
+                    ) {
+
+                        actions +=
+
+                            actionButton(
+                                "🔎 Проверить",
+                                "inspect",
+                                player.name
+                            );
+
+                    }
+
+
+                    if (
+                        state.role ===
+                        "Детектив"
+                    ) {
+
+                        actions +=
+
+                            actionButton(
+                                "🕵️ Узнать роль",
+                                "detect",
+                                player.name
+                            );
+
+                    }
+
+                }
+
+
+                /*
+                 * VOTE
+                 */
+
+                if (
+                    state.phase ===
+                    VOTE
+                ) {
+
+                    actions +=
+
+                        actionButton(
+                            "🗳️ Голос",
+                            "vote",
+                            player.name
+                        );
+
+                }
+
+            }
+
+
+            /*
+             * HOST KICK
+             */
+
+            if (
+                state.host ===
+                    profile.name &&
+                state.phase ===
+                    LOBBY &&
+                player.name !==
+                    profile.name
+            ) {
+
+                actions +=
+
+                    "<button " +
+
+                    "class='kick' " +
+
+                    "onclick='kickPlayer(\"" +
+
+                    encodeURIComponent(
+                        player.name
+                    ) +
+
+                    "\")'>" +
+
+                    "✕" +
+
+                    "</button>";
+
+            }
+
+
+            html +=
+
+                "<div class='actions'>" +
+
+                actions +
+
+                "</div>";
+
+
+            element.innerHTML =
+                html;
+
+
+            container.appendChild(
+                element
+            );
+
+        }
+    );
+
+
+    /*
+     * HOST CONTROLS
+     */
+
+    if (
+        state.phase ===
+            LOBBY &&
+        state.host ===
+            profile.name
+    ) {
+
+        const controls =
+            document.createElement(
+                "div"
+            );
+
+
+        controls.style.marginTop =
+            "15px";
+
+
+        const start =
+            document.createElement(
+                "button"
+            );
+
+
+        start.className =
+            "btn accent";
+
+
+        start.style.width =
+            "100%";
+
+
+        start.textContent =
+
+            state.players.length >= 4
+
+            ? "🎬 Начать игру"
+
+            : "🔒 Нужно минимум 4 игрока";
+
+
+        start.disabled =
+            state.players.length < 4;
+
+
+        start.onclick =
+            function() {
+
+                send(
+                    "start"
+                );
+
+            };
+
+
+        controls.appendChild(
+            start
+        );
+
+
+        if (
+            state.players.length > 1
+        ) {
+
+            const select =
+                document.createElement(
+                    "select"
+                );
+
+
+            select.className =
+                "input";
+
+
+            select.innerHTML =
+
+                "<option value=''>" +
+
+                "👑 Передать хоста..." +
+
+                "</option>";
+
+
+            state.players
+                .filter(
+                    p =>
+                        p.name !==
+                        profile.name
+                )
+                .forEach(
+                    function(p) {
+
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+
+                        option.value =
+                            p.name;
+
+                        option.textContent =
+                            p.name;
+
+                        select.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+            select.onchange =
+                function() {
+
+                    if (
+                        select.value
+                    ) {
+
+                        send(
+                            "transfer_host",
+                            select.value
+                        );
+
+                    }
+
+                };
+
+
+            controls.appendChild(
+                select
+            );
+
+        }
+
+
+        container.appendChild(
+            controls
+        );
+
+    }
+
+}
+
+
+function actionButton(
+    text,
+    type,
+    target
+) {
+
+    return (
+
+        "<button " +
+
+        "class='btn' " +
+
+        "onclick='send(\"" +
+
+        type +
+
+        "\", decodeURIComponent(\"" +
+
+        encodeURIComponent(
+            target
+        ) +
+
+        "\"))'>" +
+
+        text +
+
+        "</button>"
+
+    );
+
+}
+
+
+function kickPlayer(
+    encodedName
+) {
+
+    const name =
+        decodeURIComponent(
+            encodedName
+        );
+
+
+    if (
+        confirm(
+            "Исключить " +
+            name +
+            "?"
+        )
+    ) {
+
+        send(
+            "kick",
+            name
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   LOG
+============================================================ */
+
+function renderLog() {
+
+    const log =
+        $("log");
+
+
+    log.innerHTML =
+        "";
+
+
+    [...state.log]
+        .reverse()
+        .forEach(
+            function(message) {
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.textContent =
+                    message;
+
+
+                log.appendChild(
+                    div
+                );
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   LEAVE
+============================================================ */
+
+function leaveGame() {
+
+    if (ws) {
+
+        try {
+
+            ws.close();
+
+        }
+        catch {}
+
+    }
+
+
+    ws = null;
+
+    state = null;
+
+    $("gameScreen")
+        .classList
+        .remove(
+            "active"
+        );
+
+
+    showHome();
+
+}
 
 </script>
 
@@ -1957,7 +2424,9 @@ def generate_room_code():
     while True:
 
         code = "".join(
-            random.choice(string.digits)
+            random.choice(
+                string.digits
+            )
             for _ in range(4)
         )
 
@@ -1981,9 +2450,6 @@ def role_set(count):
 
         return None
 
-
-    # 4 ИГРОКА:
-    # 1 МАФИЯ + 3 МИРНЫХ
 
     if count == 4:
 
@@ -2087,12 +2553,16 @@ def role_set(count):
         "Детектив"
     ] + [
         "Мирный"
-    ] * (count - 8)
+    ] * (
+        count - 8
+    )
 
 
 def is_mafia(player):
 
-    return player["role"] in {
+    return player.get(
+        "role"
+    ) in {
         "Мафия",
         "Дон"
     }
@@ -2100,10 +2570,13 @@ def is_mafia(player):
 
 def alive(room, name):
 
-    player = room["players"].get(name)
+    player = room[
+        "players"
+    ].get(name)
 
     return bool(
-        player and
+        player
+        and
         player["alive"]
     )
 
@@ -2112,11 +2585,15 @@ def alive(room, name):
 # STATE
 # ============================================================
 
-def state_for(room, name):
+def state_for(
+    room,
+    name
+):
 
-    player = room["players"].get(name)
+    player = room[
+        "players"
+    ].get(name)
 
-    remaining = 0
 
     if room["ends"]:
 
@@ -2127,26 +2604,42 @@ def state_for(room, name):
             )
         )
 
+    else:
+
+        remaining = 0
+
 
     roles = None
+
 
     if room["phase"] == WIN:
 
         roles = [
+
             {
-                "name": player["name"],
-                "role": player["role"],
-                "alive": player["alive"]
+                "name":
+                    p["name"],
+
+                "role":
+                    p["role"],
+
+                "alive":
+                    p["alive"]
+
             }
 
-            for player
-            in room["players"].values()
+            for p
+            in room[
+                "players"
+            ].values()
+
         ]
 
 
     return {
 
-        "type": "state",
+        "type":
+            "state",
 
         "room":
             room["code"],
@@ -2161,12 +2654,17 @@ def state_for(room, name):
             remaining,
 
         "role":
-            player["role"]
+            player.get(
+                "role"
+            )
             if player
             else None,
 
         "alive":
-            player["alive"]
+            player.get(
+                "alive",
+                False
+            )
             if player
             else False,
 
@@ -2178,32 +2676,38 @@ def state_for(room, name):
             if player
             else False,
 
-        "players": [
+        "players":
 
-            {
-                "name":
-                    p["name"],
+            [
 
-                "alive":
-                    p["alive"],
+                {
 
-                "avatar":
-                    p.get(
-                        "avatar",
-                        ""
-                    ),
+                    "name":
+                        p["name"],
 
-                "color":
-                    p.get(
-                        "color",
-                        "#9b5cff"
-                    )
-            }
+                    "alive":
+                        p["alive"],
 
-            for p
-            in room["players"].values()
+                    "avatar":
+                        p.get(
+                            "avatar",
+                            ""
+                        ),
 
-        ],
+                    "color":
+                        p.get(
+                            "color",
+                            "#9b5cff"
+                        )
+
+                }
+
+                for p
+                in room[
+                    "players"
+                ].values()
+
+            ],
 
         "announcement":
             room["announcement"],
@@ -2220,7 +2724,9 @@ def state_for(room, name):
 async def broadcast(room):
 
     for websocket, name in list(
-        room["connections"].items()
+        room[
+            "connections"
+        ].items()
     ):
 
         try:
@@ -2234,7 +2740,9 @@ async def broadcast(room):
 
         except Exception:
 
-            room["connections"].pop(
+            room[
+                "connections"
+            ].pop(
                 websocket,
                 None
             )
@@ -2247,7 +2755,9 @@ async def broadcast(room):
 def assign_roles(room):
 
     roles = role_set(
-        len(room["players"])
+        len(
+            room["players"]
+        )
     )
 
 
@@ -2257,13 +2767,19 @@ def assign_roles(room):
 
 
     players = list(
-        room["players"].values()
+        room[
+            "players"
+        ].values()
     )
 
 
-    random.shuffle(players)
+    random.shuffle(
+        players
+    )
 
-    random.shuffle(roles)
+    random.shuffle(
+        roles
+    )
 
 
     for player, role in zip(
@@ -2271,9 +2787,13 @@ def assign_roles(room):
         roles
     ):
 
-        player["role"] = role
+        player[
+            "role"
+        ] = role
 
-        player["sheriff_used"] = False
+        player[
+            "sheriff_used"
+        ] = False
 
 
     return True
@@ -2286,39 +2806,58 @@ def assign_roles(room):
 def winner(room):
 
     alive_players = [
+
         p
+
         for p
-        in room["players"].values()
+        in room[
+            "players"
+        ].values()
+
         if p["alive"]
+
     ]
 
 
     mafia = [
+
         p
+
         for p
         in alive_players
+
         if is_mafia(p)
+
     ]
 
 
     maniac = [
+
         p
+
         for p
         in alive_players
-        if p["role"] == "Маньяк"
+
+        if p["role"] ==
+        "Маньяк"
+
     ]
 
 
     citizens = [
+
         p
+
         for p
         in alive_players
 
         if (
             not is_mafia(p)
             and
-            p["role"] != "Маньяк"
+            p["role"] !=
+            "Маньяк"
         )
+
     ]
 
 
@@ -2328,11 +2867,15 @@ def winner(room):
 
         room["ends"] = 0
 
-        room["announcement"] = (
+        room[
+            "announcement"
+        ] = (
             "🟢 Мирные жители победили!"
         )
 
-        room["log"].append(
+        room[
+            "log"
+        ].append(
             "🏆 Победа мирных жителей."
         )
 
@@ -2349,11 +2892,15 @@ def winner(room):
 
         room["ends"] = 0
 
-        room["announcement"] = (
+        room[
+            "announcement"
+        ] = (
             "🔪 Маньяк победил!"
         )
 
-        room["log"].append(
+        room[
+            "log"
+        ].append(
             "🏆 Победа маньяка."
         )
 
@@ -2363,18 +2910,24 @@ def winner(room):
     if (
         len(mafia)
         >=
-        len(citizens) + len(maniac)
+        len(citizens)
+        +
+        len(maniac)
     ):
 
         room["phase"] = WIN
 
         room["ends"] = 0
 
-        room["announcement"] = (
+        room[
+            "announcement"
+        ] = (
             "🔴 Мафия захватила город!"
         )
 
-        room["log"].append(
+        room[
+            "log"
+        ].append(
             "🏆 Победа мафии."
         )
 
@@ -2396,11 +2949,17 @@ def resolve_night(room):
 
         for target
         in (
-            room["doctor_target"],
-            room["bodyguard_target"]
+            room[
+                "doctor_target"
+            ],
+
+            room[
+                "bodyguard_target"
+            ]
         )
 
         if target
+
     }
 
 
@@ -2408,56 +2967,103 @@ def resolve_night(room):
 
 
     for target in (
-        room["night_target"],
-        room["maniac_target"]
+
+        room[
+            "night_target"
+        ],
+
+        room[
+            "maniac_target"
+        ]
+
     ):
 
         if (
+
             target
+
             and
-            alive(room, target)
+
+            alive(
+                room,
+                target
+            )
+
             and
-            target not in protected
+
+            target
+            not in
+            protected
+
             and
-            target not in deaths
+
+            target
+            not in
+            deaths
+
         ):
 
-            deaths.append(target)
+            deaths.append(
+                target
+            )
 
 
     for name in deaths:
 
-        room["players"][name][
+        room[
+            "players"
+        ][name][
             "alive"
         ] = False
 
-        room["log"].append(
+
+        room[
+            "log"
+        ].append(
+
             f"💀 Ночью погиб {name}."
+
         )
 
 
     if deaths:
 
-        room["announcement"] = (
+        room[
+            "announcement"
+        ] = (
+
             "☀️ Город просыпается. "
             "Ночью произошло убийство."
+
         )
 
     else:
 
-        room["announcement"] = (
+        room[
+            "announcement"
+        ] = (
+
             "☀️ Город просыпается. "
             "Этой ночью никто не погиб."
+
         )
 
 
-    room["night_target"] = None
+    room[
+        "night_target"
+    ] = None
 
-    room["maniac_target"] = None
+    room[
+        "maniac_target"
+    ] = None
 
-    room["doctor_target"] = None
+    room[
+        "doctor_target"
+    ] = None
 
-    room["bodyguard_target"] = None
+    room[
+        "bodyguard_target"
+    ] = None
 
 
 # ============================================================
@@ -2466,35 +3072,45 @@ def resolve_night(room):
 
 async def start_game(room):
 
-    task = room.get(
+    old_task = room.get(
         "game_task"
     )
 
 
     if (
-        task
+        old_task
         and
-        not task.done()
+        not old_task.done()
         and
-        task is not asyncio.current_task()
+        old_task
+        is not
+        asyncio.current_task()
     ):
 
-        task.cancel()
+        old_task.cancel()
 
         with suppress(
             asyncio.CancelledError
         ):
 
-            await task
+            await old_task
 
 
-    for player in room["players"].values():
+    for player in room[
+        "players"
+    ].values():
 
-        player["alive"] = True
+        player[
+            "alive"
+        ] = True
 
-        player["role"] = None
+        player[
+            "role"
+        ] = None
 
-        player["sheriff_used"] = False
+        player[
+            "sheriff_used"
+        ] = False
 
 
     room.update({
@@ -2526,19 +3142,23 @@ async def start_game(room):
             now() + 15,
 
         "announcement":
-            "🌙 Город засыпает. "
-            "Ночные роли просыпаются."
+            (
+                "🌙 Город засыпает. "
+                "Ночные роли просыпаются."
+            )
 
     })
 
 
-    assign_roles(room)
+    assign_roles(
+        room
+    )
 
 
-    room["game_task"] = (
-        asyncio.create_task(
-            game_loop(room)
-        )
+    room[
+        "game_task"
+    ] = asyncio.create_task(
+        game_loop(room)
     )
 
 
@@ -2550,92 +3170,149 @@ async def game_loop(room):
 
     try:
 
-        while room["phase"] != WIN:
+        while room[
+            "phase"
+        ] != WIN:
 
-            if room["ends"] > now():
 
-                await broadcast(room)
+            if room[
+                "ends"
+            ] > now():
+
+                await broadcast(
+                    room
+                )
 
                 await asyncio.sleep(
                     min(
                         1,
-                        room["ends"] - now()
+                        room[
+                            "ends"
+                        ] - now()
                     )
                 )
 
                 continue
 
 
+            # ==================================================
             # NIGHT
+            # ==================================================
 
-            if room["phase"] == NIGHT:
+            if room[
+                "phase"
+            ] == NIGHT:
 
-                resolve_night(room)
+                resolve_night(
+                    room
+                )
 
 
-                if winner(room):
+                if winner(
+                    room
+                ):
 
-                    await broadcast(room)
+                    await broadcast(
+                        room
+                    )
 
                     return
 
 
-                room["phase"] = DAY
+                room[
+                    "phase"
+                ] = DAY
 
-                room["ends"] = (
+
+                room[
+                    "ends"
+                ] = (
                     now() + 8
                 )
 
-                room["announcement"] = (
+
+                room[
+                    "announcement"
+                ] = (
                     "☀️ День. "
                     "Обсудите события."
                 )
 
 
-                await broadcast(room)
+                await broadcast(
+                    room
+                )
 
-                await asyncio.sleep(8)
+
+                await asyncio.sleep(
+                    8
+                )
 
 
-                if winner(room):
+                if winner(
+                    room
+                ):
 
-                    await broadcast(room)
+                    await broadcast(
+                        room
+                    )
 
                     return
 
 
-                room["phase"] = VOTE
+                room[
+                    "phase"
+                ] = VOTE
 
-                room["ends"] = (
+
+                room[
+                    "ends"
+                ] = (
                     now() + 45
                 )
 
-                room["votes"] = {}
 
-                room["announcement"] = (
+                room[
+                    "votes"
+                ] = {}
+
+
+                room[
+                    "announcement"
+                ] = (
                     "🗳️ Голосование началось."
                 )
 
 
-                await broadcast(room)
+                await broadcast(
+                    room
+                )
 
 
+            # ==================================================
             # VOTE
+            # ==================================================
 
-            elif room["phase"] == VOTE:
+            elif room[
+                "phase"
+            ] == VOTE:
 
                 counts = {}
 
 
-                for target in (
-                    room["votes"].values()
-                ):
+                for target in room[
+                    "votes"
+                ].values():
 
-                    counts[target] = (
+                    counts[
+                        target
+                    ] = (
                         counts.get(
                             target,
                             0
-                        ) + 1
+                        )
+                        +
+                        1
                     )
 
 
@@ -2647,74 +3324,110 @@ async def game_loop(room):
 
 
                     top = [
+
                         name
 
-                        for name, count
+                        for name,
+                        count
                         in counts.items()
 
-                        if count == maximum
+                        if count ==
+                        maximum
+
                     ]
 
 
                     if (
+
                         len(top) == 1
+
                         and
+
                         alive(
                             room,
                             top[0]
                         )
+
                     ):
 
                         victim = top[0]
 
 
-                        room["players"][
-                            victim
-                        ]["alive"] = False
+                        room[
+                            "players"
+                        ][victim][
+                            "alive"
+                        ] = False
 
 
-                        room["log"].append(
+                        room[
+                            "log"
+                        ].append(
+
                             f"⚖️ {victim} "
                             f"изгнан голосованием."
+
                         )
 
 
-                        room["announcement"] = (
+                        room[
+                            "announcement"
+                        ] = (
+
                             f"⚖️ {victim} "
                             f"был изгнан."
+
                         )
 
                     else:
 
-                        room["announcement"] = (
+                        room[
+                            "announcement"
+                        ] = (
                             "⚖️ Ничья. "
                             "Никто не изгнан."
                         )
 
                 else:
 
-                    room["announcement"] = (
+                    room[
+                        "announcement"
+                    ] = (
                         "🤷 Голосов нет."
                     )
 
 
-                room["votes"] = {}
+                room[
+                    "votes"
+                ] = {}
 
 
-                if winner(room):
+                if winner(
+                    room
+                ):
 
-                    await broadcast(room)
+                    await broadcast(
+                        room
+                    )
 
                     return
 
 
-                room["phase"] = NIGHT
+                room[
+                    "phase"
+                ] = NIGHT
 
-                room["ends"] = (
+
+                room[
+                    "ends"
+                ] = (
                     now() + 15
                 )
 
-                room["announcement"] = (
+
+                room[
+                    "announcement"
+                ] = (
                     "🌙 Город засыпает."
                 )
 
@@ -2746,7 +3459,9 @@ async def create():
     code = generate_room_code()
 
 
-    rooms[code] = {
+    rooms[
+        code
+    ] = {
 
         "code":
             code,
@@ -2828,7 +3543,9 @@ async def ws_endpoint(
         )
 
 
-        if first.get("type") != "join":
+        if first.get(
+            "type"
+        ) != "join":
 
             return
 
@@ -2868,10 +3585,14 @@ async def ws_endpoint(
             return
 
 
-        room = rooms[code]
+        room = rooms[
+            code
+        ]
 
 
-        if room["phase"] not in {
+        if room[
+            "phase"
+        ] not in {
             LOBBY,
             WIN
         }:
@@ -2889,7 +3610,9 @@ async def ws_endpoint(
             return
 
 
-        if name in room["players"]:
+        if name in room[
+            "players"
+        ]:
 
             await websocket.send_json({
 
@@ -2904,7 +3627,11 @@ async def ws_endpoint(
             return
 
 
-        if len(room["players"]) >= 12:
+        if len(
+            room[
+                "players"
+            ]
+        ) >= 12:
 
             await websocket.send_json({
 
@@ -2919,7 +3646,9 @@ async def ws_endpoint(
             return
 
 
-        room["players"][name] = {
+        room[
+            "players"
+        ][name] = {
 
             "name":
                 name,
@@ -2952,22 +3681,34 @@ async def ws_endpoint(
         }
 
 
-        room["connections"][
+        room[
+            "connections"
+        ][
             websocket
         ] = name
 
 
-        if room["host"] is None:
+        if room[
+            "host"
+        ] is None:
 
-            room["host"] = name
+            room[
+                "host"
+            ] = name
 
 
-        room["log"].append(
+        room[
+            "log"
+        ].append(
+
             f"🟢 {name} вошёл в комнату."
+
         )
 
 
-        await broadcast(room)
+        await broadcast(
+            room
+        )
 
 
         while True:
@@ -2992,7 +3733,8 @@ async def ws_endpoint(
             # ==================================================
 
             if (
-                command == "profile"
+                command ==
+                "profile"
                 and
                 player
             ):
@@ -3005,12 +3747,16 @@ async def ws_endpoint(
                 ).strip()[:18]
 
 
+                if not new_name:
+
+                    new_name = name
+
+
                 if new_name != name:
 
-                    if (
-                        new_name
-                        in room["players"]
-                    ):
+                    if new_name in room[
+                        "players"
+                    ]:
 
                         await websocket.send_json({
 
@@ -3025,40 +3771,47 @@ async def ws_endpoint(
                         continue
 
 
-                    room["players"][
-                        new_name
-                    ] = room[
+                    room[
+                        "players"
+                    ][new_name] = room[
                         "players"
                     ].pop(name)
 
 
-                    room["players"][
-                        new_name
-                    ]["name"] = (
-                        new_name
-                    )
+                    room[
+                        "players"
+                    ][new_name][
+                        "name"
+                    ] = new_name
 
 
-                    room["connections"][
+                    room[
+                        "connections"
+                    ][
                         websocket
                     ] = new_name
 
 
-                    if room["host"] == name:
+                    if room[
+                        "host"
+                    ] == name:
 
-                        room["host"] = (
-                            new_name
-                        )
+                        room[
+                            "host"
+                        ] = new_name
 
 
                     name = new_name
+
 
                     player = room[
                         "players"
                     ][name]
 
 
-                player["avatar"] = str(
+                player[
+                    "avatar"
+                ] = str(
                     data.get(
                         "avatar",
                         ""
@@ -3066,7 +3819,9 @@ async def ws_endpoint(
                 )[:600000]
 
 
-                player["color"] = str(
+                player[
+                    "color"
+                ] = str(
                     data.get(
                         "color",
                         "#9b5cff"
@@ -3074,7 +3829,9 @@ async def ws_endpoint(
                 )[:20]
 
 
-                await broadcast(room)
+                await broadcast(
+                    room
+                )
 
                 continue
 
@@ -3085,13 +3842,17 @@ async def ws_endpoint(
 
             if command == "start":
 
-                if name != room["host"]:
+                if name != room[
+                    "host"
+                ]:
 
                     continue
 
 
                 if len(
-                    room["players"]
+                    room[
+                        "players"
+                    ]
                 ) < 4:
 
                     await websocket.send_json({
@@ -3107,7 +3868,9 @@ async def ws_endpoint(
                     continue
 
 
-                if room["phase"] in {
+                if room[
+                    "phase"
+                ] in {
                     LOBBY,
                     WIN
                 }:
@@ -3120,6 +3883,7 @@ async def ws_endpoint(
                         room
                     )
 
+
                 continue
 
 
@@ -3129,7 +3893,15 @@ async def ws_endpoint(
 
             if command == "kick":
 
-                if name != room["host"]:
+                if (
+                    name != room[
+                        "host"
+                    ]
+                    or
+                    room[
+                        "phase"
+                    ] != LOBBY
+                ):
 
                     continue
 
@@ -3143,16 +3915,23 @@ async def ws_endpoint(
 
 
                 if (
+
                     target
-                    in room["players"]
+                    in room[
+                        "players"
+                    ]
+
                     and
+
                     target != name
-                    and
-                    room["phase"] == LOBBY
+
                 ):
 
+
                     for ws, player_name in list(
-                        room["connections"].items()
+                        room[
+                            "connections"
+                        ].items()
                     ):
 
                         if player_name == target:
@@ -3168,6 +3947,7 @@ async def ws_endpoint(
                                         "Ты был исключён хостом."
 
                                 })
+
 
                                 await ws.close()
 
@@ -3192,9 +3972,13 @@ async def ws_endpoint(
                     )
 
 
-                    room["log"].append(
+                    room[
+                        "log"
+                    ].append(
+
                         f"👢 {target} "
                         f"был исключён хостом."
+
                     )
 
 
@@ -3212,7 +3996,9 @@ async def ws_endpoint(
 
             if command == "transfer_host":
 
-                if name != room["host"]:
+                if name != room[
+                    "host"
+                ]:
 
                     continue
 
@@ -3226,19 +4012,31 @@ async def ws_endpoint(
 
 
                 if (
+
                     target
-                    in room["players"]
+                    in room[
+                        "players"
+                    ]
+
                     and
+
                     target != name
+
                 ):
 
-                    room["host"] = target
+                    room[
+                        "host"
+                    ] = target
 
 
-                    room["log"].append(
+                    room[
+                        "log"
+                    ].append(
+
                         f"👑 {name} "
                         f"передал хоста "
                         f"{target}."
+
                     )
 
 
@@ -3257,7 +4055,9 @@ async def ws_endpoint(
             if (
                 not player
                 or
-                not player["alive"]
+                not player[
+                    "alive"
+                ]
             ):
 
                 continue
@@ -3288,15 +4088,25 @@ async def ws_endpoint(
             # ==================================================
 
             if (
-                command == "kill"
+
+                command ==
+                "kill"
+
                 and
-                room["phase"] == NIGHT
+
+                room[
+                    "phase"
+                ] == NIGHT
+
                 and
-                player["role"]
-                in {
+
+                player[
+                    "role"
+                ] in {
                     "Мафия",
                     "Дон"
                 }
+
             ):
 
                 room[
@@ -3309,12 +4119,23 @@ async def ws_endpoint(
             # ==================================================
 
             elif (
-                command == "maniac_kill"
+
+                command ==
+                "maniac_kill"
+
                 and
-                room["phase"] == NIGHT
+
+                room[
+                    "phase"
+                ] == NIGHT
+
                 and
-                player["role"]
-                == "Маньяк"
+
+                player[
+                    "role"
+                ] ==
+                "Маньяк"
+
             ):
 
                 room[
@@ -3327,12 +4148,23 @@ async def ws_endpoint(
             # ==================================================
 
             elif (
-                command == "heal"
+
+                command ==
+                "heal"
+
                 and
-                room["phase"] == NIGHT
+
+                room[
+                    "phase"
+                ] == NIGHT
+
                 and
-                player["role"]
-                == "Доктор"
+
+                player[
+                    "role"
+                ] ==
+                "Доктор"
+
             ):
 
                 room[
@@ -3345,12 +4177,23 @@ async def ws_endpoint(
             # ==================================================
 
             elif (
-                command == "protect"
+
+                command ==
+                "protect"
+
                 and
-                room["phase"] == NIGHT
+
+                room[
+                    "phase"
+                ] == NIGHT
+
                 and
-                player["role"]
-                == "Телохранитель"
+
+                player[
+                    "role"
+                ] ==
+                "Телохранитель"
+
             ):
 
                 room[
@@ -3360,20 +4203,32 @@ async def ws_endpoint(
 
             # ==================================================
             # SHERIFF
-            # ONE TIME
             # ==================================================
 
             elif (
-                command == "inspect"
+
+                command ==
+                "inspect"
+
                 and
-                room["phase"] == NIGHT
+
+                room[
+                    "phase"
+                ] == NIGHT
+
                 and
-                player["role"]
-                == "Шериф"
+
+                player[
+                    "role"
+                ] ==
+                "Шериф"
+
                 and
+
                 not player[
                     "sheriff_used"
                 ]
+
             ):
 
                 player[
@@ -3381,24 +4236,23 @@ async def ws_endpoint(
                 ] = True
 
 
-                target_player = room[
-                    "players"
-                ][target]
+                target_player =
+                    room[
+                        "players"
+                    ][target]
 
 
                 if is_mafia(
                     target_player
                 ):
 
-                    result = (
+                    result =
                         "🔴 МАФИЯ"
-                    )
 
                 else:
 
-                    result = (
+                    result =
                         "🟢 НЕ МАФИЯ"
-                    )
 
 
                 await websocket.send_json({
@@ -3418,12 +4272,23 @@ async def ws_endpoint(
             # ==================================================
 
             elif (
-                command == "detect"
+
+                command ==
+                "detect"
+
                 and
-                room["phase"] == NIGHT
+
+                room[
+                    "phase"
+                ] == NIGHT
+
                 and
-                player["role"]
-                == "Детектив"
+
+                player[
+                    "role"
+                ] ==
+                "Детектив"
+
             ):
 
                 await websocket.send_json({
@@ -3445,9 +4310,16 @@ async def ws_endpoint(
             # ==================================================
 
             elif (
-                command == "vote"
+
+                command ==
+                "vote"
+
                 and
-                room["phase"] == VOTE
+
+                room[
+                    "phase"
+                ] == VOTE
+
             ):
 
                 room[
@@ -3497,38 +4369,92 @@ async def ws_endpoint(
                 )
 
 
-                room["log"].append(
-                    f"🔴 {name} "
-                    f"вышел из игры."
+                room[
+                    "votes"
+                ].pop(
+                    name,
+                    None
                 )
 
 
-                # Если вышел хост
-                # автоматически передаём хоста
+                room[
+                    "log"
+                ].append(
 
-                if room["host"] == name:
+                    f"🔴 {name} "
+                    f"вышел из игры."
 
-                    room["host"] = (
-                        next(
-                            iter(
-                                room["players"]
-                            ),
-                            None
-                        )
+                )
+
+
+                # ==========================================
+                # HOST LEFT
+                # ==========================================
+
+                if room[
+                    "host"
+                ] == name:
+
+                    room[
+                        "host"
+                    ] = next(
+                        iter(
+                            room[
+                                "players"
+                            ]
+                        ),
+                        None
                     )
 
 
-                    if room["host"]:
+                    if room[
+                        "host"
+                    ]:
 
-                        room["log"].append(
+                        room[
+                            "log"
+                        ].append(
+
                             f"👑 Новый хост: "
                             f"{room['host']}"
+
                         )
 
 
-                await broadcast(
-                    room
-                )
+                # ==========================================
+                # EMPTY ROOM
+                # ==========================================
+
+                if not room[
+                    "players"
+                ]:
+
+                    task = room.get(
+                        "game_task"
+                    )
+
+
+                    if (
+                        task
+                        and
+                        not task.done()
+                    ):
+
+                        task.cancel()
+
+
+                    rooms.pop(
+                        room[
+                            "code"
+                        ],
+                        None
+                    )
+
+                else:
+
+                    await broadcast(
+                        room
+                    )
 
 
 # ============================================================
