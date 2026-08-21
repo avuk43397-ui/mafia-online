@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#08090b" />
+  <title>Dub Studio — студия озвучки</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">🎙</div>
+        <div><div class="brand-name">DUB STUDIO</div><div class="brand-sub">студия озвучки</div></div>
+      </div>
+      <div class="top-actions">
+        <span id="projectStatus" class="status-dot">Не открыт проект</span>
+        <button class="ghost" id="resetProjectBtn">Сбросить</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">YOUR DUBBING WORKSPACE</div>
+          <h1>Озвучивайте сцены<br><span>по очереди и вместе.</span></h1>
+          <p>Загрузите dub-пак ZIP или папку, смотрите исходный момент, включайте/выключайте оригинальный звук, записывайте дубли и собирайте готовый MP4.</p>
+        </div>
+        <div class="hero-card">
+          <div class="hero-icon">◉</div>
+          <div><b>Локальная обработка</b><small>Исходники и записи используются прямо в браузере. На Render хранить ваши видео не нужно.</small></div>
+        </div>
+      </section>
+
+      <section id="uploadSection" class="upload-panel panel">
+        <div class="section-title-row">
+          <div><div class="section-kicker">ШАГ 01</div><h2>Импорт dub-пака</h2></div>
+          <div class="mini-hint">ZIP / папка</div>
+        </div>
+        <div id="dropzone" class="dropzone">
+          <div class="drop-icon">⇧</div>
+          <div class="drop-title">Перетащите ZIP сюда</div>
+          <div class="drop-sub">или выберите архив / папку с видео и текстами</div>
+          <div class="drop-buttons">
+            <label class="primary-btn">Выбрать ZIP<input id="zipInput" type="file" accept=".zip,application/zip" hidden /></label>
+            <label class="secondary-btn">Выбрать папку<input id="filesInput" type="file" webkitdirectory directory multiple hidden /></label>
+          </div>
+          <div class="format-note">MP4, WEBM, MOV, M4V, AVI · TXT, SRT, VTT, JSON</div>
+        </div>
+      </section>
+
+      <section id="workspace" class="workspace hidden">
+        <div class="workspace-grid">
+          <aside class="scene-sidebar panel">
+            <div class="sidebar-head">
+              <div><div class="section-kicker">ПРОЕКТ</div><h2 id="projectName">Dub project</h2></div>
+              <span id="sceneCount" class="count-pill">0</span>
+            </div>
+
+            <div class="actor-switch">
+              <button class="actor active" data-actor="A">Диктор A</button>
+              <button class="actor" data-actor="B">Диктор B</button>
+            </div>
+
+            <label class="auto-next"><input id="autoNext" type="checkbox" checked /> <span>После записи — следующая сцена</span></label>
+
+            <div class="progress-wrap">
+              <div class="progress-label"><span>Прогресс</span><b id="progressText">0%</b></div>
+              <div class="progress"><i id="progressBar"></i></div>
+            </div>
+
+            <div id="sceneList" class="scene-list"></div>
+            <div class="sidebar-footer">
+              <button id="exportBtn" class="export-btn" disabled>Собрать MP4</button>
+              <div id="exportStatus" class="export-status"></div>
+            </div>
+          </aside>
+
+          <section class="editor panel">
+            <div class="editor-head">
+              <div><div class="section-kicker">ОЗВУЧКА</div><h2 id="sceneTitle">Выберите сцену</h2><div id="sceneMeta" class="scene-meta">—</div></div>
+              <div class="scene-nav"><button id="prevBtn" class="icon-btn" title="Предыдущая сцена">←</button><button id="nextBtn" class="icon-btn" title="Следующая сцена">→</button></div>
+            </div>
+
+            <div class="video-wrap">
+              <video id="video" playsinline preload="metadata"></video>
+              <div id="videoPlaceholder" class="video-placeholder">Здесь появится видео сцены</div>
+              <div class="video-overlay"><button id="playBtn" class="play-btn">▶</button><div class="sound-state"><span id="soundLabel">Звук включён</span></div></div>
+            </div>
+
+            <div class="controls-row">
+              <button id="soundBtn" class="control-btn active"><span>🔊</span><span id="soundBtnText">Слышать оригинал</span></button>
+              <button id="micBtn" class="control-btn"><span>🎙</span> Микрофон</button>
+              <div class="timecode" id="timecode">00:00 / 00:00</div>
+            </div>
+
+            <div class="script-card">
+              <div class="script-head"><span>ТЕКСТ СЦЕНЫ</span><small id="lineLabel">Строка 1 / 1</small></div>
+              <div id="scriptText" class="script-text">Загрузите dub-пак, чтобы увидеть текст.</div>
+              <div class="script-nav"><button id="prevLineBtn" class="text-btn">← Предыдущая реплика</button><button id="nextLineBtn" class="text-btn">Следующая реплика →</button></div>
+              <div class="script-actions"><button id="recordBtn" class="record-btn" disabled><span class="rec-dot"></span><span id="recordBtnText">Начать запись</span></button><button id="stopBtn" class="stop-btn" disabled>Остановить</button></div>
+              <div id="takeInfo" class="take-info">Записей пока нет.</div>
+            </div>
+
+            <div class="takes-panel"><div class="takes-head"><h3>Дубли сцены</h3><button id="clearTakeBtn" class="text-btn">Очистить</button></div><div id="takesList" class="takes-list"></div></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
